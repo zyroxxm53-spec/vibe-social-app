@@ -2,639 +2,499 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#ffffff">
-<title>Vibe — Connect your world</title>
-<style>
-:root{--blue:#5145e5;--bg:#f7f8fc;--text:#191a24;--muted:#777b8c;--line:#e8eaf1}
-*{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--text);font:15px Arial,sans-serif}
-button,input,textarea{font:inherit}
-button{cursor:pointer;border:0;border-radius:11px;padding:11px 15px;background:var(--blue);color:white;font-weight:600}
-button:disabled{opacity:.6;cursor:wait}
-input,textarea{width:100%;padding:12px;border:1px solid var(--line);border-radius:12px;background:white;color:var(--text);margin:6px 0 12px}
-textarea{resize:vertical}
-label{font-size:14px;font-weight:600}
-header{position:sticky;top:0;z-index:2;background:white;border-bottom:1px solid var(--line);padding:15px;display:flex;justify-content:space-between;align-items:center;gap:12px}
-.logo{font-size:29px;font-weight:900;color:var(--blue)}
-main{max-width:650px;margin:22px auto;padding:0 14px 100px}
-.card{background:white;border:1px solid var(--line);border-radius:16px;padding:17px;margin-bottom:15px}
-.muted{font-size:13px;color:var(--muted);overflow-wrap:anywhere}
-.hidden{display:none!important}
-#notice{margin:10px 0;color:var(--blue);overflow-wrap:anywhere}
-.post-head{display:flex;align-items:center;gap:10px;margin-bottom:12px}
-.avatar{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:#e9e7ff;color:var(--blue);font-weight:bold;flex-shrink:0;overflow:hidden}
-.avatar img{width:100%;height:100%;object-fit:cover}
-.big-avatar{width:100px;height:100px;font-size:30px;margin:8px auto 16px}
-.post-text{white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.55}
-.post-image{display:block;width:100%;max-height:500px;object-fit:contain;border-radius:12px;margin:12px 0}
-.profile-heading{text-align:center}
-.button-row{display:flex;gap:8px;flex-wrap:wrap}
-.button-row button{flex:1}
-.secondary{background:#eeeefe;color:var(--blue)}
-#avatarPreview{width:100px;height:100px;border-radius:50%;object-fit:cover;margin:8px auto 14px}
-footer{position:fixed;z-index:3;bottom:0;left:0;right:0;background:white;border-top:1px solid var(--line);display:flex;justify-content:center;gap:8px;padding:10px}
-footer button{background:white;color:#555;flex:1;max-width:150px}
-.hint{font-size:12px;color:var(--muted);line-height:1.5;margin-top:-5px}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#ffffff">
+  <title>Vibe — Connect with your people</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; background: #f6f7fb; color: #172033;
+      font: 15px Arial, sans-serif;
+    }
+    header {
+      background: white; padding: 17px 20px; border-bottom: 1px solid #e5e7eb;
+      display: flex; justify-content: space-between; align-items: center;
+      position: sticky; top: 0; z-index: 2;
+    }
+    .brand { font-size: 26px; font-weight: 800; color: #635bff; }
+    main { max-width: 620px; margin: 24px auto; padding: 0 14px; }
+    .card {
+      background: white; border: 1px solid #e8eaf0; border-radius: 16px;
+      padding: 20px; margin-bottom: 16px;
+    }
+    h2 { margin-top: 0; }
+    input, textarea {
+      width: 100%; padding: 13px; margin: 7px 0 12px;
+      border: 1px solid #d8dce5; border-radius: 10px;
+      font: inherit; background: white; color: #172033;
+    }
+    textarea { resize: vertical; min-height: 90px; }
+    button {
+      padding: 12px 16px; border: 0; border-radius: 10px;
+      background: #635bff; color: white; font-weight: 700;
+      cursor: pointer; margin: 3px 4px 3px 0;
+    }
+    button:disabled { opacity: .6; }
+    button.secondary { background: #eef0ff; color: #5148e5; }
+    button.danger { background: #fff0f0; color: #bd3030; }
+    .muted { color: #737b8c; font-size: 13px; }
+    .hidden { display: none !important; }
+    #status {
+      padding: 12px; border-radius: 10px; margin-bottom: 14px;
+      background: #eef0ff; color: #3730a3; overflow-wrap: anywhere;
+    }
+    #status.error { background: #fff0f0; color: #a51d1d; }
+    .post { white-space: pre-wrap; overflow-wrap: anywhere; margin: 15px 0; }
+    .post-head { display: flex; justify-content: space-between; gap: 8px; }
+    .post-actions { border-top: 1px solid #eee; padding-top: 10px; }
+    .comment { padding: 9px; background: #f7f8fc; border-radius: 8px; margin: 7px 0; }
+    .profile-name { font-size: 19px; font-weight: 700; }
+    footer { text-align: center; padding: 25px; color: #858b99; }
+  </style>
 </head>
 <body>
 <header>
-  <div class="logo">vibe.</div>
-  <div id="accountLabel" class="muted">Your social space</div>
+  <div class="brand">Vibe.</div>
+  <button id="logoutBtn" class="secondary hidden">Log out</button>
 </header>
 
 <main>
-  <div id="notice" role="status" aria-live="polite"></div>
+  <div id="status" role="status">Starting Vibe…</div>
 
   <section id="authCard" class="card">
-    <h2>Welcome to Vibe</h2>
-    <p class="muted">Create an account or log in to share with your community.</p>
+    <h2>Welcome to Vibe 👋</h2>
+    <p class="muted">Connect with your people.</p>
     <form id="authForm">
       <label for="email">Email address</label>
-      <input id="email" type="email" autocomplete="email" placeholder="you@example.com" required>
+      <input id="email" type="email" autocomplete="email"
+        placeholder="you@example.com" required>
       <label for="password">Password</label>
-      <input id="password" type="password" minlength="6" autocomplete="current-password" placeholder="At least 6 characters" required>
-      <div class="button-row">
-        <button id="loginBtn" type="submit">Log in</button>
-        <button id="signupBtn" type="button">Create account</button>
-      </div>
+      <input id="password" type="password" autocomplete="current-password"
+        placeholder="At least 6 characters" minlength="6" required>
+      <button id="loginBtn" type="submit">Log in</button>
+      <button id="signupBtn" type="button" class="secondary">Create account</button>
     </form>
+    <p class="muted">If email confirmation is enabled, confirm your email before logging in.</p>
   </section>
 
   <section id="appArea" class="hidden">
-    <section class="card" id="profileCard">
-      <div class="profile-heading">
-        <h2>Your profile</h2>
-        <div id="profileAvatar" class="avatar big-avatar">V</div>
-        <h3 id="profileDisplayName">Vibe user</h3>
-        <p id="profileUsername" class="muted">@username</p>
-        <p id="profileBio" class="muted">Add a little about yourself.</p>
-      </div>
-
-      <button id="editProfileBtn" type="button">Edit profile</button>
-
-      <form id="profileForm" class="hidden">
-        <h3>Edit your profile</h3>
-        <label for="avatarFile">Profile picture</label>
-        <input id="avatarFile" type="file" accept="image/jpeg,image/png,image/webp">
-        <p class="hint">JPG, PNG or WebP, maximum 2 MB.</p>
-        <img id="avatarPreview" class="hidden" alt="Profile picture preview">
-
-        <label for="displayNameInput">Display name</label>
-        <input id="displayNameInput" maxlength="50" required placeholder="Your name">
-
-        <label for="usernameInput">Username</label>
-        <input id="usernameInput" maxlength="20" minlength="3" required placeholder="your_username" autocomplete="username">
-        <p class="hint">3–20 letters, numbers or underscores. Usernames must be unique.</p>
-
-        <label for="bioInput">Bio</label>
-        <textarea id="bioInput" maxlength="160" rows="3" placeholder="Tell people about yourself"></textarea>
-
-        <div class="button-row">
-          <button id="saveProfileBtn" type="submit">Save profile</button>
-          <button id="cancelProfileBtn" class="secondary" type="button">Cancel</button>
-        </div>
+    <section class="card">
+      <h2>Your profile</h2>
+      <div id="profileName" class="profile-name"></div>
+      <form id="profileForm">
+        <label for="displayName">Display name</label>
+        <input id="displayName" maxlength="60" required>
+        <label for="username">Username</label>
+        <input id="username" maxlength="30" pattern="[A-Za-z0-9_]+"
+          title="Use letters, numbers, and underscores" required>
+        <label for="bio">Bio</label>
+        <textarea id="bio" maxlength="160" placeholder="Tell people about yourself"></textarea>
+        <button type="submit">Save profile</button>
       </form>
     </section>
 
     <section class="card">
-      <h2>What's happening?</h2>
+      <h2>Create a post</h2>
       <form id="postForm">
-        <textarea id="postContent" maxlength="2000" placeholder="Share something with your people..."></textarea>
-        <input id="postImage" type="url" placeholder="Image URL (optional)">
-        <button id="publishBtn" type="submit">Share post</button>
+        <textarea id="postText" maxlength="2000"
+          placeholder="What's on your mind?" required></textarea>
+        <button type="submit">Publish post</button>
       </form>
     </section>
 
-    <section class="card" id="feedSection">
+    <section>
       <h2>Your feed</h2>
-      <input id="searchInput" type="search" placeholder="Search posts or usernames...">
-      <button id="refreshBtn" type="button">Refresh feed</button>
-    </section>
-
-    <div id="feed"></div>
-
-    <section class="card">
-      <h3>Your account</h3>
-      <p id="profileInfo" class="muted"></p>
-      <button id="logoutBtn" type="button">Log out</button>
+      <div id="feed"></div>
     </section>
   </section>
 </main>
+<footer>Vibe · Your people, your space.</footer>
 
-<footer>
-  <button id="homeBtn" type="button">Home</button>
-  <button id="searchBtn" type="button">Search</button>
-  <button id="profileBtn" type="button">Profile</button>
-</footer>
+<script>
+(function () {
+  "use strict";
 
-<script type="module">
-import { createClient } from
-  "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
+  const SUPABASE_URL = "https://nmslfnhbqprwpsxacuvy.supabase.co";
+  const SUPABASE_KEY = "sb_publishable_Snp3A0a0m_2HNCQwi2uR1g_RQ6id2uH";
 
-const SUPABASE_URL = "https://nmslfnhbqprwpsxacuvy.supabase.co";
-const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_Snp3A0a0m_2HNCQwi2uR1g_RQ6id2uH";
+  const $ = id => document.getElementById(id);
+  let supabase = null;
+  let currentUser = null;
+  let currentProfile = null;
+  let busy = false;
 
-const $ = id => document.getElementById(id);
-const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
-
-let currentUser = null;
-let currentProfile = null;
-let allPosts = [];
-let feedRequest = 0;
-let originalAvatarUrl = "";
-
-function notice(message, error = false) {
-  $("notice").textContent = message;
-  $("notice").style.color = error ? "#c0392b" : "#27834a";
-}
-
-function safeImageUrl(value) {
-  if (!value) return "";
-  try {
-    const url = new URL(value);
-    return ["https:", "http:"].includes(url.protocol) ? url.href : "";
-  } catch {
-    return "";
+  function status(message, isError = false) {
+    $("status").textContent = message;
+    $("status").classList.toggle("error", isError);
+    $("status").classList.remove("hidden");
   }
-}
 
-function makeAvatar(container, name, url, big = false) {
-  container.replaceChildren();
-  container.className = big ? "avatar big-avatar" : "avatar";
-
-  const safeUrl = safeImageUrl(url);
-  if (safeUrl) {
-    const img = document.createElement("img");
-    img.src = safeUrl;
-    img.alt = (name || "User") + "'s profile picture";
-    img.loading = "lazy";
-    img.onerror = () => {
-      container.replaceChildren();
-      container.textContent = (name || "V").charAt(0).toUpperCase();
-    };
-    container.appendChild(img);
-  } else {
-    container.textContent = (name || "V").charAt(0).toUpperCase();
+  function showApp(signedIn) {
+    $("authCard").classList.toggle("hidden", signedIn);
+    $("appArea").classList.toggle("hidden", !signedIn);
+    $("logoutBtn").classList.toggle("hidden", !signedIn);
   }
-}
 
-function setSignedIn(user) {
-  currentUser = user || null;
-  $("authCard").classList.toggle("hidden", !!currentUser);
-  $("appArea").classList.toggle("hidden", !currentUser);
-  $("accountLabel").textContent =
-    currentUser ? currentUser.email : "Your social space";
-
-  if (!currentUser) {
-    currentProfile = null;
-    allPosts = [];
-    $("feed").replaceChildren();
-    $("profileForm").classList.add("hidden");
-    $("editProfileBtn").classList.remove("hidden");
-    $("profileInfo").textContent = "";
-  } else {
-    $("profileInfo").textContent = "Signed in as " + currentUser.email;
+  function setBusy(value) {
+    busy = value;
+    document.querySelectorAll("button").forEach(button => {
+      button.disabled = value;
+    });
   }
-}
 
-function generatedUsername() {
-  return "user_" + currentUser.id.replaceAll("-", "").slice(0, 12);
-}
+  function friendlyError(error) {
+    const message = error && error.message ? error.message : String(error);
+    console.error("Vibe error:", error);
+    status(message, true);
+  }
 
-async function loadProfile() {
-  if (!currentUser) return;
+  async function runTask(task) {
+    if (busy) return;
+    setBusy(true);
+    try {
+      await task();
+    } catch (error) {
+      friendlyError(error);
+    } finally {
+      setBusy(false);
+    }
+  }
 
-  try {
+  function make(tag, text, className) {
+    const element = document.createElement(tag);
+    if (text !== undefined) element.textContent = text;
+    if (className) element.className = className;
+    return element;
+  }
+
+  async function loadProfile() {
     const { data, error } = await supabase
       .from("profiles")
-      .select("id,username,display_name,bio,avatar_url,created_at")
+      .select("*")
       .eq("id", currentUser.id)
       .maybeSingle();
 
     if (error) throw error;
 
-    if (data) {
-      currentProfile = data;
+    if (!data) {
+      const base = (currentUser.email || "vibeuser")
+        .split("@")[0].toLowerCase().replace(/[^a-z0-9_]/g, "")
+        .slice(0, 18) || "vibeuser";
+      const profile = {
+        id: currentUser.id,
+        username: base + "_" + currentUser.id.slice(0, 5),
+        display_name: base,
+        bio: "",
+        created_at: new Date().toISOString()
+      };
+
+      const result = await supabase.from("profiles")
+        .upsert(profile, { onConflict: "id" })
+        .select().single();
+
+      if (result.error) throw result.error;
+      currentProfile = result.data;
     } else {
-      const fallbackName =
-        (currentUser.email || "Vibe user").split("@")[0];
-
-      const { data: created, error: createError } = await supabase
-        .from("profiles")
-        .insert({
-          id: currentUser.id,
-          username: generatedUsername(),
-          display_name: fallbackName.slice(0, 50),
-          bio: ""
-        })
-        .select()
-        .single();
-
-      if (createError) throw createError;
-      currentProfile = created;
+      currentProfile = data;
     }
 
-    renderProfile();
-  } catch (e) {
-    notice("Could not load your profile: " + e.message, true);
+    $("profileName").textContent =
+      currentProfile.display_name || currentProfile.username;
+    $("displayName").value = currentProfile.display_name || "";
+    $("username").value = currentProfile.username || "";
+    $("bio").value = currentProfile.bio || "";
   }
-}
 
-function renderProfile() {
-  if (!currentProfile) return;
+  async function loadFeed() {
+    $("feed").replaceChildren(make("p", "Loading posts…", "muted"));
 
-  const name = currentProfile.display_name || "Vibe user";
-  $("profileDisplayName").textContent = name;
-  $("profileUsername").textContent =
-    "@" + (currentProfile.username || "user");
-  $("profileBio").textContent =
-    currentProfile.bio || "No bio yet. Tell people about yourself.";
-
-  makeAvatar($("profileAvatar"), name, currentProfile.avatar_url, true);
-
-  $("displayNameInput").value = currentProfile.display_name || "";
-  $("usernameInput").value = currentProfile.username || "";
-  $("bioInput").value = currentProfile.bio || "";
-
-  originalAvatarUrl = currentProfile.avatar_url || "";
-  $("avatarFile").value = "";
-  $("avatarPreview").classList.add("hidden");
-  $("avatarPreview").removeAttribute("src");
-}
-
-async function loadFeed() {
-  if (!currentUser) return;
-
-  const request = ++feedRequest;
-  $("feed").textContent = "Loading posts...";
-
-  try {
-    const { data, error } = await supabase
+    const { data: posts, error } = await supabase
       .from("posts")
-      .select(`
-        id,
-        user_id,
-        content,
-        image_url,
-        created_at,
-        profiles!posts_user_id_fkey (
-          username,
-          display_name,
-          avatar_url
-        )
-      `)
+      .select("*")
       .order("created_at", { ascending: false })
       .limit(50);
 
     if (error) throw error;
-    if (request !== feedRequest) return;
 
-    allPosts = data || [];
-    renderFeed();
-  } catch (e) {
-    if (request !== feedRequest) return;
-    $("feed").replaceChildren();
-
-    const box = document.createElement("div");
-    box.className = "card";
-    box.textContent = "Could not load posts: " + e.message;
-    $("feed").appendChild(box);
-  }
-}
-
-function renderFeed() {
-  const query = $("searchInput").value.trim().toLowerCase();
-
-  const posts = allPosts.filter(post => {
-    const profile = post.profiles || {};
-    return (post.content || "").toLowerCase().includes(query) ||
-      (profile.username || "").toLowerCase().includes(query) ||
-      (profile.display_name || "").toLowerCase().includes(query);
-  });
-
-  $("feed").replaceChildren();
-
-  if (!posts.length) {
-    const box = document.createElement("div");
-    box.className = "card muted";
-    box.textContent = query
-      ? "No matching posts found."
-      : "No posts yet. Be the first to share!";
-    $("feed").appendChild(box);
-    return;
-  }
-
-  for (const post of posts) {
-    const profile = post.profiles || {};
-    const name = profile.display_name || profile.username || "Vibe user";
-
-    const card = document.createElement("article");
-    card.className = "card";
-
-    const head = document.createElement("div");
-    head.className = "post-head";
-
-    const avatar = document.createElement("div");
-    makeAvatar(avatar, name, profile.avatar_url);
-
-    const details = document.createElement("div");
-    const title = document.createElement("strong");
-    title.textContent = name;
-
-    const username = document.createElement("div");
-    username.className = "muted";
-    username.textContent = "@" + (profile.username || "user");
-
-    details.append(title, username);
-    head.append(avatar, details);
-    card.appendChild(head);
-
-    if (post.content) {
-      const content = document.createElement("p");
-      content.className = "post-text";
-      content.textContent = post.content;
-      card.appendChild(content);
+    if (!posts || posts.length === 0) {
+      $("feed").replaceChildren(make("div",
+        "No posts yet. Be the first to share something!", "card muted"));
+      return;
     }
 
-    const imageUrl = safeImageUrl(post.image_url);
-    if (imageUrl) {
-      const img = document.createElement("img");
-      img.className = "post-image";
-      img.src = imageUrl;
-      img.alt = "Post image";
-      img.loading = "lazy";
-      img.referrerPolicy = "no-referrer";
-      card.appendChild(img);
+    const ids = posts.map(post => post.id);
+    const { data: profiles, error: profileError } = await supabase
+      .from("profiles").select("id,username,display_name").in(
+        "id", [...new Set(posts.map(post => post.user_id))]
+      );
+
+    if (profileError) throw profileError;
+
+    const profileMap = Object.fromEntries(
+      (profiles || []).map(profile => [profile.id, profile])
+    );
+
+    const { data: likes, error: likesError } = await supabase
+      .from("likes").select("post_id,user_id").in("post_id", ids);
+
+    if (likesError) throw likesError;
+
+    const { data: comments, error: commentsError } = await supabase
+      .from("comments").select("*").in("post_id", ids)
+      .order("created_at", { ascending: true });
+
+    if (commentsError) throw commentsError;
+
+    const commentProfiles = [...new Set((comments || []).map(c => c.user_id))];
+    let commentProfileMap = {};
+    if (commentProfiles.length) {
+      const { data: cps, error: cpError } = await supabase
+        .from("profiles").select("id,username,display_name")
+        .in("id", commentProfiles);
+      if (cpError) throw cpError;
+      commentProfileMap = Object.fromEntries(
+        (cps || []).map(p => [p.id, p])
+      );
     }
 
-    const time = document.createElement("div");
-    time.className = "muted";
-    time.textContent = new Date(post.created_at).toLocaleString();
-    card.appendChild(time);
+    const fragment = document.createDocumentFragment();
 
-    $("feed").appendChild(card);
-  }
-}
+    posts.forEach(post => {
+      const author = profileMap[post.user_id];
+      const card = make("article", undefined, "card");
+      const head = make("div", undefined, "post-head");
+      const authorName = author
+        ? (author.display_name || author.username)
+        : "Vibe user";
 
-async function signIn(event) {
-  event.preventDefault();
-  $("loginBtn").disabled = true;
-  notice("Logging in...");
+      head.append(make("strong", authorName));
+      head.append(make("span", new Date(post.created_at).toLocaleString(),
+        "muted"));
+      card.append(head);
 
-  try {
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email: $("email").value.trim(),
-      password: $("password").value
+      card.append(make("div", post.content || post.body || "", "post"));
+
+      const postLikes = (likes || []).filter(l => l.post_id === post.id);
+      const liked = postLikes.some(l => l.user_id === currentUser.id);
+      const actions = make("div", undefined, "post-actions");
+      const likeButton = make("button",
+        (liked ? "♥ Liked" : "♡ Like") + " (" + postLikes.length + ")");
+      likeButton.className = "secondary";
+      likeButton.type = "button";
+      likeButton.addEventListener("click", () => runTask(async () => {
+        if (liked) {
+          const { error } = await supabase.from("likes").delete()
+            .eq("post_id", post.id).eq("user_id", currentUser.id);
+          if (error) throw error;
+        } else {
+          const { error } = await supabase.from("likes").insert({
+            post_id: post.id, user_id: currentUser.id
+          });
+          if (error) throw error;
+        }
+        await loadFeed();
+        status("Like updated.");
+      }));
+      actions.append(likeButton);
+      card.append(actions);
+
+      const postComments = (comments || []).filter(
+        c => c.post_id === post.id
+      );
+      const commentArea = make("div");
+      postComments.forEach(comment => {
+        const cp = commentProfileMap[comment.user_id];
+        const name = cp ? (cp.display_name || cp.username) : "User";
+        commentArea.append(make("div",
+          name + ": " + (comment.content || comment.body || ""),
+          "comment"));
+      });
+      card.append(commentArea);
+
+      const commentForm = make("form");
+      const commentInput = make("input");
+      commentInput.placeholder = "Write a comment…";
+      commentInput.maxLength = 1000;
+      commentInput.required = true;
+      commentForm.append(commentInput);
+      const commentButton = make("button", "Comment");
+      commentButton.type = "submit";
+      commentForm.append(commentButton);
+      commentForm.addEventListener("submit", event => {
+        event.preventDefault();
+        runTask(async () => {
+          const { error } = await supabase.from("comments").insert({
+            post_id: post.id,
+            user_id: currentUser.id,
+            content: commentInput.value.trim()
+          });
+          if (error) throw error;
+          await loadFeed();
+          status("Comment published.");
+        });
+      });
+      card.append(commentForm);
+      fragment.append(card);
     });
 
-    if (error) throw error;
-
-    setSignedIn(data.user);
-    await loadProfile();
-    await loadFeed();
-    notice("Logged in successfully!");
-  } catch (e) {
-    notice(e.message || "Login failed.", true);
-  } finally {
-    $("loginBtn").disabled = false;
-  }
-}
-
-async function signUp() {
-  const email = $("email").value.trim();
-  const password = $("password").value;
-
-  if (!email || password.length < 6) {
-    notice("Enter a valid email and a password of at least 6 characters.", true);
-    return;
+    $("feed").replaceChildren(fragment);
   }
 
-  $("signupBtn").disabled = true;
-  notice("Creating your account...");
+  $("authForm").addEventListener("submit", event => {
+    event.preventDefault();
+    runTask(async () => {
+      const email = $("email").value.trim();
+      const password = $("password").value;
 
-  try {
+      status("Logging in…");
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email, password
+      });
+
+      if (error) throw error;
+      currentUser = data.user;
+      await openUser();
+      status("Welcome back to Vibe!");
+    });
+  });
+
+  $("signupBtn").addEventListener("click", () => runTask(async () => {
+    const email = $("email").value.trim();
+    const password = $("password").value;
+    if (!email || password.length < 6) {
+      status("Enter a valid email and a password of at least 6 characters.", true);
+      return;
+    }
+
+    status("Creating your account…");
     const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
+      email, password,
       options: {
-        emailRedirectTo: window.location.origin
+        emailRedirectTo: location.origin
       }
     });
 
     if (error) throw error;
 
-    if (data.session) {
-      setSignedIn(data.session.user);
-      await loadProfile();
-      await loadFeed();
-      notice("Account created! Welcome to Vibe.");
+    if (data.session && data.user) {
+      currentUser = data.user;
+      await openUser();
+      status("Account created. Welcome to Vibe!");
     } else {
-      notice("Account created. Check your email for confirmation, then log in.");
+      status("Account created! Check your email for the confirmation link, then return here and log in.");
     }
-  } catch (e) {
-    notice(e.message || "Account creation failed.", true);
-  } finally {
-    $("signupBtn").disabled = false;
-  }
-}
+  }));
 
-async function uploadAvatar(file) {
-  if (!currentUser) throw new Error("Please log in first.");
-  if (!file) return originalAvatarUrl;
+  $("profileForm").addEventListener("submit", event => {
+    event.preventDefault();
+    runTask(async () => {
+      const username = $("username").value.trim().toLowerCase();
+      const display_name = $("displayName").value.trim();
+      const bio = $("bio").value.trim();
 
-  const types = {
-    "image/jpeg": "jpg",
-    "image/png": "png",
-    "image/webp": "webp"
-  };
+      if (!/^[a-z0-9_]{3,30}$/.test(username)) {
+        status("Username must be 3–30 characters: letters, numbers, underscores.", true);
+        return;
+      }
 
-  if (!types[file.type]) {
-    throw new Error("Choose a JPG, PNG or WebP image.");
-  }
+      const { data, error } = await supabase.from("profiles").upsert({
+        id: currentUser.id, username, display_name, bio
+      }, { onConflict: "id" }).select().single();
 
-  if (file.size > 2 * 1024 * 1024) {
-    throw new Error("Your picture must be 2 MB or smaller.");
-  }
-
-  const path = currentUser.id + "/" + Date.now() + "." + types[file.type];
-
-  const { error } = await supabase.storage
-    .from("avatars")
-    .upload(path, file, {
-      contentType: file.type,
-      cacheControl: "3600",
-      upsert: false
+      if (error) throw error;
+      currentProfile = data;
+      $("profileName").textContent = display_name;
+      status("Profile saved!");
     });
+  });
 
-  if (error) throw error;
+  $("postForm").addEventListener("submit", event => {
+    event.preventDefault();
+    runTask(async () => {
+      const content = $("postText").value.trim();
+      if (!content) return;
+      status("Publishing post…");
 
-  return supabase.storage.from("avatars").getPublicUrl(path).data.publicUrl;
-}
+      const { error } = await supabase.from("posts").insert({
+        user_id: currentUser.id,
+        content
+      });
 
-async function saveProfile(event) {
-  event.preventDefault();
-  if (!currentUser) return notice("Please log in first.", true);
+      if (error) throw error;
+      $("postText").value = "";
+      await loadFeed();
+      status("Your post is live!");
+    });
+  });
 
-  const displayName = $("displayNameInput").value.trim();
-  const username = $("usernameInput").value.trim().toLowerCase();
-  const bio = $("bioInput").value.trim();
-  const file = $("avatarFile").files[0];
-
-  if (!displayName) return notice("Please enter a display name.", true);
-
-  if (!/^[a-z0-9_]{3,20}$/.test(username)) {
-    return notice("Username must be 3–20 letters, numbers or underscores.", true);
-  }
-
-  $("saveProfileBtn").disabled = true;
-  notice("Saving your profile...");
-
-  try {
-    const { data: existing, error: checkError } = await supabase
-      .from("profiles")
-      .select("id")
-      .eq("username", username)
-      .neq("id", currentUser.id)
-      .limit(1);
-
-    if (checkError) throw checkError;
-    if (existing?.length) throw new Error("That username is already taken.");
-
-    const avatarUrl = file ? await uploadAvatar(file) : originalAvatarUrl;
-
-    const { data, error } = await supabase
-      .from("profiles")
-      .update({
-        username,
-        display_name: displayName,
-        bio,
-        avatar_url: avatarUrl || null
-      })
-      .eq("id", currentUser.id)
-      .select()
-      .maybeSingle();
-
+  $("logoutBtn").addEventListener("click", () => runTask(async () => {
+    const { error } = await supabase.auth.signOut();
     if (error) throw error;
-    if (!data) throw new Error("Profile update was not accepted. Refresh and try again.");
+    currentUser = null;
+    currentProfile = null;
+    showApp(false);
+    status("You have logged out.");
+  }));
 
-    currentProfile = data;
-    renderProfile();
-    $("profileForm").classList.add("hidden");
-    $("editProfileBtn").classList.remove("hidden");
-    notice("Profile saved successfully!");
+  async function openUser() {
+    showApp(true);
+    await loadProfile();
     await loadFeed();
-  } catch (e) {
-    notice(e.message || "Could not save your profile.", true);
-  } finally {
-    $("saveProfileBtn").disabled = false;
-  }
-}
-
-async function createPost(event) {
-  event.preventDefault();
-  if (!currentUser) return notice("Please log in first.", true);
-
-  const content = $("postContent").value.trim();
-  const imageUrl = $("postImage").value.trim();
-
-  if (!content && !imageUrl) {
-    return notice("Write something or add an image URL before posting.", true);
   }
 
-  if (imageUrl && !safeImageUrl(imageUrl)) {
-    return notice("Please enter a valid image URL.", true);
-  }
+  async function start() {
+    status("Loading Supabase library…");
 
-  $("publishBtn").disabled = true;
-  notice("Publishing post...");
+    if (!window.supabase || !window.supabase.createClient) {
+      throw new Error(
+        "Supabase library did not load. Check your internet connection, then reload the page."
+      );
+    }
 
-  try {
-    const { error } = await supabase.from("posts").insert({
-      user_id: currentUser.id,
-      content: content || null,
-      image_url: imageUrl || null
-    });
+    supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    status("Connecting to Vibe…");
 
+    const { data, error } = await supabase.auth.getSession();
     if (error) throw error;
 
-    $("postContent").value = "";
-    $("postImage").value = "";
-    notice("Your post has been published!");
-    await loadFeed();
-  } catch (e) {
-    notice(e.message || "Could not publish post.", true);
-  } finally {
-    $("publishBtn").disabled = false;
-  }
-}
+    if (data.session && data.session.user) {
+      currentUser = data.session.user;
+      await openUser();
+      status("Welcome back to Vibe!");
+    } else {
+      showApp(false);
+      status("Ready. Log in or create your account.");
+    }
 
-async function logOut() {
-  const { error } = await supabase.auth.signOut();
-  if (error) return notice(error.message, true);
-
-  setSignedIn(null);
-  notice("You have logged out.");
-}
-
-$("authForm").addEventListener("submit", signIn);
-$("signupBtn").addEventListener("click", signUp);
-$("postForm").addEventListener("submit", createPost);
-$("profileForm").addEventListener("submit", saveProfile);
-$("refreshBtn").addEventListener("click", loadFeed);
-$("searchInput").addEventListener("input", renderFeed);
-$("logoutBtn").addEventListener("click", logOut);
-
-$("editProfileBtn").addEventListener("click", () => {
-  renderProfile();
-  $("profileForm").classList.remove("hidden");
-  $("editProfileBtn").classList.add("hidden");
-  $("profileForm").scrollIntoView({ behavior: "smooth", block: "start" });
-});
-
-$("cancelProfileBtn").addEventListener("click", () => {
-  $("profileForm").classList.add("hidden");
-  $("editProfileBtn").classList.remove("hidden");
-  if (currentProfile) renderProfile();
-});
-
-$("avatarFile").addEventListener("change", () => {
-  const file = $("avatarFile").files[0];
-  const preview = $("avatarPreview");
-
-  if (!file) {
-    preview.classList.add("hidden");
-    preview.removeAttribute("src");
-    return;
+    supabase.auth.onAuthStateChange((_event, session) => {
+      if (session && session.user && !currentUser) {
+        currentUser = session.user;
+        openUser().catch(friendlyError);
+      }
+    });
   }
 
-  if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
-    $("avatarFile").value = "";
-    notice("Choose a JPG, PNG or WebP image.", true);
-    return;
-  }
+  window.addEventListener("error", event => {
+    status("JavaScript error: " + (event.message || "Unknown error"), true);
+  });
 
-  if (file.size > 2 * 1024 * 1024) {
-    $("avatarFile").value = "";
-    notice("Your picture must be 2 MB or smaller.", true);
-    return;
-  }
+  window.addEventListener("unhandledrejection", event => {
+    const reason = event.reason;
+    status("App error: " + (reason && reason.message
+      ? reason.message : String(reason)), true);
+  });
 
-  preview.src = URL.createObjectURL(file);
-  preview.classList.remove("hidden");
-});
-
-$("homeBtn").addEventListener("click", () => {
-  window.scrollTo({ top: 0, behavior: "smooth" });
-});
-
-$("searchBtn").addEventListener("click", () => {
-  $("searchInput").focus();
-  $("feedSection").scrollIntoView({ behavior: "smooth", block: "center" });
-});
-
-$("profileBtn").addEventListener("click", () => {
-  $("profileCard").scrollIntoView({ behavior: "smooth", block: "start" });
-}
+  // Load Supabase first, then start the app.
+  const library = document.createElement("script");
+  library.src = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2";
+  library.onload = () => start().catch(friendlyError);
+  library.onerror = () => status(
+    "Could not load Supabase. Check your connection or CDN access and reload.",
+    true
+  );
+  document.head.appendChild(library);
+})();
+</script>
+</body>
+</html>
