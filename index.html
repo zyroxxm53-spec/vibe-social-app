@@ -2,499 +2,384 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#ffffff">
-  <title>Vibe — Connect with your people</title>
-  <style>
-    * { box-sizing: border-box; }
-    body {
-      margin: 0; background: #f6f7fb; color: #172033;
-      font: 15px Arial, sans-serif;
-    }
-    header {
-      background: white; padding: 17px 20px; border-bottom: 1px solid #e5e7eb;
-      display: flex; justify-content: space-between; align-items: center;
-      position: sticky; top: 0; z-index: 2;
-    }
-    .brand { font-size: 26px; font-weight: 800; color: #635bff; }
-    main { max-width: 620px; margin: 24px auto; padding: 0 14px; }
-    .card {
-      background: white; border: 1px solid #e8eaf0; border-radius: 16px;
-      padding: 20px; margin-bottom: 16px;
-    }
-    h2 { margin-top: 0; }
-    input, textarea {
-      width: 100%; padding: 13px; margin: 7px 0 12px;
-      border: 1px solid #d8dce5; border-radius: 10px;
-      font: inherit; background: white; color: #172033;
-    }
-    textarea { resize: vertical; min-height: 90px; }
-    button {
-      padding: 12px 16px; border: 0; border-radius: 10px;
-      background: #635bff; color: white; font-weight: 700;
-      cursor: pointer; margin: 3px 4px 3px 0;
-    }
-    button:disabled { opacity: .6; }
-    button.secondary { background: #eef0ff; color: #5148e5; }
-    button.danger { background: #fff0f0; color: #bd3030; }
-    .muted { color: #737b8c; font-size: 13px; }
-    .hidden { display: none !important; }
-    #status {
-      padding: 12px; border-radius: 10px; margin-bottom: 14px;
-      background: #eef0ff; color: #3730a3; overflow-wrap: anywhere;
-    }
-    #status.error { background: #fff0f0; color: #a51d1d; }
-    .post { white-space: pre-wrap; overflow-wrap: anywhere; margin: 15px 0; }
-    .post-head { display: flex; justify-content: space-between; gap: 8px; }
-    .post-actions { border-top: 1px solid #eee; padding-top: 10px; }
-    .comment { padding: 9px; background: #f7f8fc; border-radius: 8px; margin: 7px 0; }
-    .profile-name { font-size: 19px; font-weight: 700; }
-    footer { text-align: center; padding: 25px; color: #858b99; }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#ffffff">
+<title>Vibe — Your people, your space</title>
+<style>
+:root {
+  --bg:#f7f8fc; --surface:#fff; --text:#172033; --muted:#8991a3;
+  --line:#eceef4; --accent:#6857f5; --accent-light:#f0edff;
+  --pink:#f15b83; --shadow:0 5px 25px rgba(27,35,70,.045);
+}
+* {box-sizing:border-box}
+body {margin:0;background:var(--bg);color:var(--text);font:14px Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif}
+button,input,textarea {font:inherit}
+button {cursor:pointer;transition:.2s}
+button:disabled {opacity:.55;cursor:wait}
+.hidden {display:none!important}
+.muted {color:var(--muted);font-size:12px}
+header {
+  height:70px;background:rgba(255,255,255,.94);border-bottom:1px solid var(--line);
+  display:flex;align-items:center;justify-content:space-between;padding:0 5%;
+  position:sticky;top:0;z-index:10;backdrop-filter:blur(14px)
+}
+.brand {font-size:29px;font-weight:900;letter-spacing:-1.7px;color:var(--accent)}
+.brand span {color:var(--text)}
+.header-right {display:flex;align-items:center;gap:12px}
+.header-tag {color:var(--muted);font-size:12px}
+button.primary {background:var(--accent);color:white;border:0;border-radius:12px;padding:12px 17px;font-weight:750}
+button.primary:hover {filter:brightness(.96);transform:translateY(-1px)}
+button.secondary {background:var(--accent-light);color:var(--accent);border:0;border-radius:11px;padding:11px 14px;font-weight:700}
+button.ghost {background:transparent;color:var(--muted);border:1px solid var(--line);border-radius:10px;padding:9px 12px}
+button.danger {background:#fff0f1;color:#cf3655;border:0;border-radius:10px;padding:10px}
+.layout {max-width:1240px;margin:28px auto;padding:0 22px;display:grid;grid-template-columns:220px minmax(0,620px) 260px;gap:25px;align-items:start}
+.side,.right-side {position:sticky;top:94px}
+.panel,.card {background:var(--surface);border:1px solid var(--line);border-radius:19px;box-shadow:var(--shadow)}
+.side {padding:15px}
+.nav-title {font-size:11px;text-transform:uppercase;letter-spacing:1.3px;color:var(--muted);padding:10px 12px}
+.nav-item {display:flex;align-items:center;gap:12px;width:100%;padding:13px 12px;margin:3px 0;border:0;background:transparent;border-radius:12px;text-align:left;color:#596176;font-weight:650}
+.nav-item .ico {width:23px;font-size:18px;text-align:center}
+.nav-item.active,.nav-item:hover {background:var(--accent-light);color:var(--accent)}
+.side-note {border-top:1px solid var(--line);margin-top:14px;padding:16px 10px 5px;line-height:1.7}
+main {min-width:0}
+#status {padding:12px 15px;border-radius:12px;background:var(--accent-light);color:#5140c8;margin-bottom:15px;overflow-wrap:anywhere}
+#status.error {background:#fff0f1;color:#ae2340}
+.card {padding:20px;margin-bottom:17px}
+h1,h2,h3,p {margin-top:0}
+h2 {font-size:19px;letter-spacing:-.4px;margin-bottom:8px}
+h3 {font-size:14px;margin-bottom:10px}
+input,textarea {
+  width:100%;border:1px solid #e4e7ef;border-radius:12px;padding:13px 14px;
+  margin:7px 0 13px;background:#fbfcff;color:var(--text);outline:none
+}
+input:focus,textarea:focus {border-color:#9b90ff;box-shadow:0 0 0 3px #6857f51a}
+textarea {min-height:95px;resize:vertical}
+label {font-size:12px;font-weight:700;color:#60697c}
+.auth-wrap {max-width:440px;margin:65px auto;padding:0 16px}
+.auth-card {padding:30px}
+.auth-logo {font-size:40px;font-weight:900;color:var(--accent);letter-spacing:-2px;margin-bottom:10px}
+.auth-card h2 {font-size:25px}
+.auth-card button {margin:4px 4px 4px 0}
+.auth-foot {line-height:1.7;margin-top:15px}
+.profile-top {display:flex;align-items:center;gap:13px;margin-bottom:19px}
+.avatar {
+  width:46px;height:46px;border-radius:50%;display:flex;align-items:center;
+  justify-content:center;background:linear-gradient(135deg,#8978ff,#eaa1cc);
+  color:white;font-weight:850;font-size:17px;flex-shrink:0
+}
+.avatar.small {width:36px;height:36px;font-size:13px}
+.profile-name {font-size:17px;font-weight:800}
+.profile-handle {font-size:12px;color:var(--muted);margin-top:4px}
+.composer {display:flex;gap:12px;align-items:flex-start}
+.composer textarea {min-height:70px;margin:0 0 12px;background:#f8f9fd;border:0}
+.composer-bottom {display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.feed-heading {display:flex;justify-content:space-between;align-items:center;margin:23px 3px 14px}
+.post-card {padding:19px}
+.post-head {display:flex;justify-content:space-between;gap:10px;align-items:center}
+.author {display:flex;align-items:center;gap:10px;min-width:0}
+.author strong {display:block;overflow-wrap:anywhere}
+.post-date {font-size:11px;color:var(--muted);margin-top:4px}
+.post {white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.8;font-size:14px;margin:19px 0}
+.post-actions {display:flex;align-items:center;gap:8px;border-top:1px solid var(--line);padding-top:12px}
+.action-btn {border:0;border-radius:10px;background:transparent;color:#697186;padding:9px 11px;font-weight:700}
+.action-btn:hover {background:#f5f3ff;color:var(--accent)}
+.action-btn.liked {color:var(--pink);background:#fff0f4}
+.comments {margin-top:13px}
+.comment {padding:10px 12px;background:#f7f8fc;border-radius:11px;margin:7px 0;line-height:1.6;overflow-wrap:anywhere}
+.comment-form {display:flex;gap:8px;margin-top:12px}
+.comment-form input {margin:0;min-width:0;padding:11px}
+.comment-form button {white-space:nowrap}
+.right-card {padding:17px;margin-bottom:16px}
+.search-box {position:relative;margin-bottom:15px}
+.search-box input {padding-left:40px;margin:0;background:white}
+.search-symbol {position:absolute;left:14px;top:14px;color:var(--muted)}
+.story-strip {display:flex;gap:15px;overflow-x:auto;padding:4px 0 15px;margin-bottom:8px}
+.story {min-width:62px;text-align:center;font-size:11px;color:var(--muted)}
+.story-ring {width:54px;height:54px;border-radius:50%;padding:3px;margin:0 auto 7px;background:linear-gradient(135deg,#7159ff,#f46d9a)}
+.story-ring div {background:white;width:100%;height:100%;border-radius:50%;display:grid;place-items:center;font-size:19px}
+.story-caption {white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.people-row {display:flex;align-items:center;gap:10px;margin:15px 0}
+.people-row .details {min-width:0;flex:1}
+.people-row strong {font-size:12px;display:block;overflow-wrap:anywhere}
+.people-row .muted {margin-top:4px}
+.right-title {display:flex;align-items:center;justify-content:space-between}
+.empty {padding:25px 12px;text-align:center;color:var(--muted);line-height:1.7}
+.empty-icon {font-size:30px;margin-bottom:10px}
+footer {text-align:center;color:var(--muted);font-size:11px;padding:25px 12px}
+#profilePanel {scroll-margin-top:90px}
+#feed {min-width:0}
+@media(max-width:1050px) {
+ .layout {grid-template-columns:190px minmax(0,620px);justify-content:center}
+ .right-side {display:none}
+}
+@media(max-width:680px) {
+ header {height:61px;padding:0 16px}
+ .brand {font-size:26px}
+ .header-tag {display:none}
+ .layout {display:block;margin:15px auto;padding:0 12px}
+ .side {position:fixed;top:auto;bottom:0;left:0;right:0;z-index:20;border-radius:16px 16px 0 0;
+   padding:6px 8px calc(6px + env(safe-area-inset-bottom));display:flex;justify-content:space-around;
+   border:1px solid var(--line);background:rgba(255,255,255,.97)}
+ .nav-title,.side-note {display:none}
+ .nav-item {width:auto;flex:1;justify-content:center;padding:11px 3px;margin:0;gap:0}
+ .nav-item .nav-label {display:none}
+ .nav-item .ico {font-size:21px;width:auto}
+ main {padding-bottom:75px}
+ .card {border-radius:16px;padding:16px}
+ .post-card {padding:15px}
+ .auth-wrap {margin:35px auto}
+ .auth-card {padding:23px}
+ .feed-heading {margin-top:19px}
+}
+</style>
 </head>
 <body>
 <header>
-  <div class="brand">Vibe.</div>
-  <button id="logoutBtn" class="secondary hidden">Log out</button>
+  <div class="brand">vibe<span>.</span></div>
+  <div class="header-right">
+    <span class="header-tag">Your people, your space.</span>
+    <button id="logoutBtn" class="ghost hidden">Log out ↗</button>
+  </div>
 </header>
 
-<main>
-  <div id="status" role="status">Starting Vibe…</div>
-
-  <section id="authCard" class="card">
-    <h2>Welcome to Vibe 👋</h2>
-    <p class="muted">Connect with your people.</p>
+<section id="authCard" class="auth-wrap">
+  <div class="panel auth-card">
+    <div class="auth-logo">vibe.</div>
+    <h2>Your world. Your people.</h2>
+    <p class="muted">A little space on the internet that feels like yours.</p>
     <form id="authForm">
-      <label for="email">Email address</label>
-      <input id="email" type="email" autocomplete="email"
-        placeholder="you@example.com" required>
-      <label for="password">Password</label>
-      <input id="password" type="password" autocomplete="current-password"
-        placeholder="At least 6 characters" minlength="6" required>
-      <button id="loginBtn" type="submit">Log in</button>
-      <button id="signupBtn" type="button" class="secondary">Create account</button>
+      <label for="email">EMAIL ADDRESS</label>
+      <input id="email" type="email" autocomplete="email" placeholder="you@example.com" required>
+      <label for="password">PASSWORD</label>
+      <input id="password" type="password" autocomplete="current-password" placeholder="At least 6 characters" minlength="6" required>
+      <button id="loginBtn" class="primary" type="submit">Log in →</button>
+      <button id="signupBtn" class="secondary" type="button">Create account</button>
     </form>
-    <p class="muted">If email confirmation is enabled, confirm your email before logging in.</p>
-  </section>
+    <p class="muted auth-foot">By joining Vibe, you get a space to share thoughts and connect with your people.</p>
+  </div>
+</section>
 
-  <section id="appArea" class="hidden">
-    <section class="card">
-      <h2>Your profile</h2>
-      <div id="profileName" class="profile-name"></div>
-      <form id="profileForm">
-        <label for="displayName">Display name</label>
-        <input id="displayName" maxlength="60" required>
-        <label for="username">Username</label>
-        <input id="username" maxlength="30" pattern="[A-Za-z0-9_]+"
-          title="Use letters, numbers, and underscores" required>
-        <label for="bio">Bio</label>
-        <textarea id="bio" maxlength="160" placeholder="Tell people about yourself"></textarea>
-        <button type="submit">Save profile</button>
-      </form>
-    </section>
+<div id="status" role="status">Starting Vibe…</div>
 
-    <section class="card">
-      <h2>Create a post</h2>
-      <form id="postForm">
-        <textarea id="postText" maxlength="2000"
-          placeholder="What's on your mind?" required></textarea>
-        <button type="submit">Publish post</button>
-      </form>
-    </section>
+<div id="appArea" class="layout hidden">
+  <aside class="side panel">
+    <div class="nav-title">YOUR SPACE</div>
+    <button class="nav-item active" data-view="home"><span class="ico">⌂</span><span class="nav-label">Home feed</span></button>
+    <button class="nav-item" data-view="search"><span class="ico">⌕</span><span class="nav-label">Explore posts</span></button>
+    <button class="nav-item" data-view="profile"><span class="ico">◎</span><span class="nav-label">My profile</span></button>
+    <button class="nav-item" data-view="messages"><span class="ico">✉</span><span class="nav-label">Messages</span></button>
+    <div class="side-note muted">Small moments.<br>Real connections.<br><strong>Welcome to Vibe.</strong></div>
+  </aside>
 
-    <section>
-      <h2>Your feed</h2>
+  <main>
+    <section id="homePanel">
+      <div class="card">
+        <div class="right-title"><h2>Good vibes only ✨</h2><span class="muted">YOUR FEED</span></div>
+        <p class="muted">A fresh start, a new thought, a little moment. Share yours.</p>
+        <div class="story-strip">
+          <div class="story"><div class="story-ring"><div>＋</div></div><div class="story-caption">Your story</div></div>
+          <div class="story"><div class="story-ring"><div>☀</div></div><div class="story-caption">Daily vibes</div></div>
+          <div class="story"><div class="story-ring"><div>♫</div></div><div class="story-caption">Good music</div></div>
+          <div class="story"><div class="story-ring"><div>☕</div></div><div class="story-caption">Slow days</div></div>
+          <div class="story"><div class="story-ring"><div>✦</div></div><div class="story-caption">Your space</div></div>
+        </div>
+      </div>
+
+      <section class="card">
+        <div class="profile-top">
+          <div class="avatar" id="composerAvatar">V</div>
+          <div><div class="profile-name" id="composerName">Your next thought?</div><div class="profile-handle">Share it with the Vibe community</div></div>
+        </div>
+        <form id="postForm">
+          <div class="composer"><textarea id="postText" maxlength="2000" placeholder="What's on your mind?" required></textarea></div>
+          <div class="composer-bottom"><span class="muted">✦ Make it yours</span><button class="primary" type="submit">Publish post ↗</button></div>
+        </form>
+      </section>
+
+      <div class="feed-heading"><h2>Latest posts</h2><span class="muted">THE COMMUNITY</span></div>
       <div id="feed"></div>
     </section>
-  </section>
-</main>
+
+    <section id="searchPanel" class="card hidden">
+      <h2>Explore Vibe</h2>
+      <p class="muted">Search posts currently loaded in your feed.</p>
+      <div class="search-box"><span class="search-symbol">⌕</span><input id="feedSearch" type="search" placeholder="Search posts or people…"></div>
+      <div id="searchResults" class="muted">Type to search your feed.</div>
+    </section>
+
+    <section id="profilePanel" class="card hidden">
+      <div class="profile-top">
+        <div class="avatar" id="profileAvatar">V</div>
+        <div><h2 id="profileName">Your profile</h2><p class="muted">Make your space feel like you.</p></div>
+      </div>
+      <form id="profileForm">
+        <label for="displayName">DISPLAY NAME</label>
+        <input id="displayName" maxlength="60" required>
+        <label for="username">USERNAME</label>
+        <input id="username" maxlength="30" pattern="[A-Za-z0-9_]+" title="Use letters, numbers, and underscores" required>
+        <label for="bio">BIO</label>
+        <textarea id="bio" maxlength="160" placeholder="Tell people about yourself"></textarea>
+        <button class="primary" type="submit">Save changes ✓</button>
+      </form>
+    </section>
+
+    <section id="messagesPanel" class="card hidden">
+      <div class="empty"><div class="empty-icon">✉</div><h2>Messages are coming</h2><p>Private messaging is planned for the next stage. We'll connect it to your existing Supabase messages table after checking its columns and security policies.</p></div>
+    </section>
+  </main>
+
+  <aside class="right-side">
+    <section class="panel right-card">
+      <h3>Your account</h3>
+      <div class="people-row"><div class="avatar small" id="sideAvatar">V</div><div class="details"><strong id="sideName">Vibe member</strong><div id="sideHandle" class="muted">@member</div></div></div>
+      <button class="secondary" id="editProfileBtn" style="width:100%">Edit profile</button>
+    </section>
+    <section class="panel right-card">
+      <h3>Community guidelines</h3>
+      <p class="muted" style="line-height:1.8;margin-bottom:0">Be kind. Respect privacy. Share responsibly. Make Vibe a welcoming space for everyone.</p>
+    </section>
+    <section class="panel right-card">
+      <h3>Vibe note ✦</h3>
+      <p class="muted" style="line-height:1.8;margin-bottom:0">You don't have to be perfect to post. Just be yourself.</p>
+    </section>
+  </aside>
+</div>
 <footer>Vibe · Your people, your space.</footer>
 
 <script>
 (function () {
-  "use strict";
+"use strict";
 
-  const SUPABASE_URL = "https://nmslfnhbqprwpsxacuvy.supabase.co";
-  const SUPABASE_KEY = "sb_publishable_Snp3A0a0m_2HNCQwi2uR1g_RQ6id2uH";
+const SUPABASE_URL = "https://nmslfnhbqprwpsxacuvy.supabase.co";
+const SUPABASE_KEY = "sb_publishable_Snp3A0a0m_2HNCQwi2uR1g_RQ6id2uH";
+const $ = id => document.getElementById(id);
+let supabase = null, currentUser = null, currentProfile = null, busy = false;
+let feedPosts = [];
 
-  const $ = id => document.getElementById(id);
-  let supabase = null;
-  let currentUser = null;
-  let currentProfile = null;
-  let busy = false;
-
-  function status(message, isError = false) {
-    $("status").textContent = message;
-    $("status").classList.toggle("error", isError);
-    $("status").classList.remove("hidden");
-  }
-
-  function showApp(signedIn) {
-    $("authCard").classList.toggle("hidden", signedIn);
-    $("appArea").classList.toggle("hidden", !signedIn);
-    $("logoutBtn").classList.toggle("hidden", !signedIn);
-  }
-
-  function setBusy(value) {
-    busy = value;
-    document.querySelectorAll("button").forEach(button => {
-      button.disabled = value;
-    });
-  }
-
-  function friendlyError(error) {
-    const message = error && error.message ? error.message : String(error);
-    console.error("Vibe error:", error);
-    status(message, true);
-  }
-
-  async function runTask(task) {
-    if (busy) return;
-    setBusy(true);
-    try {
-      await task();
-    } catch (error) {
-      friendlyError(error);
-    } finally {
-      setBusy(false);
-    }
-  }
-
-  function make(tag, text, className) {
-    const element = document.createElement(tag);
-    if (text !== undefined) element.textContent = text;
-    if (className) element.className = className;
-    return element;
-  }
-
-  async function loadProfile() {
-    const { data, error } = await supabase
-      .from("profiles")
-      .select("*")
-      .eq("id", currentUser.id)
-      .maybeSingle();
-
-    if (error) throw error;
-
-    if (!data) {
-      const base = (currentUser.email || "vibeuser")
-        .split("@")[0].toLowerCase().replace(/[^a-z0-9_]/g, "")
-        .slice(0, 18) || "vibeuser";
-      const profile = {
-        id: currentUser.id,
-        username: base + "_" + currentUser.id.slice(0, 5),
-        display_name: base,
-        bio: "",
-        created_at: new Date().toISOString()
-      };
-
-      const result = await supabase.from("profiles")
-        .upsert(profile, { onConflict: "id" })
-        .select().single();
-
-      if (result.error) throw result.error;
-      currentProfile = result.data;
-    } else {
-      currentProfile = data;
-    }
-
-    $("profileName").textContent =
-      currentProfile.display_name || currentProfile.username;
-    $("displayName").value = currentProfile.display_name || "";
-    $("username").value = currentProfile.username || "";
-    $("bio").value = currentProfile.bio || "";
-  }
-
-  async function loadFeed() {
-    $("feed").replaceChildren(make("p", "Loading posts…", "muted"));
-
-    const { data: posts, error } = await supabase
-      .from("posts")
-      .select("*")
-      .order("created_at", { ascending: false })
-      .limit(50);
-
-    if (error) throw error;
-
-    if (!posts || posts.length === 0) {
-      $("feed").replaceChildren(make("div",
-        "No posts yet. Be the first to share something!", "card muted"));
-      return;
-    }
-
-    const ids = posts.map(post => post.id);
-    const { data: profiles, error: profileError } = await supabase
-      .from("profiles").select("id,username,display_name").in(
-        "id", [...new Set(posts.map(post => post.user_id))]
-      );
-
-    if (profileError) throw profileError;
-
-    const profileMap = Object.fromEntries(
-      (profiles || []).map(profile => [profile.id, profile])
-    );
-
-    const { data: likes, error: likesError } = await supabase
-      .from("likes").select("post_id,user_id").in("post_id", ids);
-
-    if (likesError) throw likesError;
-
-    const { data: comments, error: commentsError } = await supabase
-      .from("comments").select("*").in("post_id", ids)
-      .order("created_at", { ascending: true });
-
-    if (commentsError) throw commentsError;
-
-    const commentProfiles = [...new Set((comments || []).map(c => c.user_id))];
-    let commentProfileMap = {};
-    if (commentProfiles.length) {
-      const { data: cps, error: cpError } = await supabase
-        .from("profiles").select("id,username,display_name")
-        .in("id", commentProfiles);
-      if (cpError) throw cpError;
-      commentProfileMap = Object.fromEntries(
-        (cps || []).map(p => [p.id, p])
-      );
-    }
-
-    const fragment = document.createDocumentFragment();
-
-    posts.forEach(post => {
-      const author = profileMap[post.user_id];
-      const card = make("article", undefined, "card");
-      const head = make("div", undefined, "post-head");
-      const authorName = author
-        ? (author.display_name || author.username)
-        : "Vibe user";
-
-      head.append(make("strong", authorName));
-      head.append(make("span", new Date(post.created_at).toLocaleString(),
-        "muted"));
-      card.append(head);
-
-      card.append(make("div", post.content || post.body || "", "post"));
-
-      const postLikes = (likes || []).filter(l => l.post_id === post.id);
-      const liked = postLikes.some(l => l.user_id === currentUser.id);
-      const actions = make("div", undefined, "post-actions");
-      const likeButton = make("button",
-        (liked ? "♥ Liked" : "♡ Like") + " (" + postLikes.length + ")");
-      likeButton.className = "secondary";
-      likeButton.type = "button";
-      likeButton.addEventListener("click", () => runTask(async () => {
-        if (liked) {
-          const { error } = await supabase.from("likes").delete()
-            .eq("post_id", post.id).eq("user_id", currentUser.id);
-          if (error) throw error;
-        } else {
-          const { error } = await supabase.from("likes").insert({
-            post_id: post.id, user_id: currentUser.id
-          });
-          if (error) throw error;
-        }
-        await loadFeed();
-        status("Like updated.");
-      }));
-      actions.append(likeButton);
-      card.append(actions);
-
-      const postComments = (comments || []).filter(
-        c => c.post_id === post.id
-      );
-      const commentArea = make("div");
-      postComments.forEach(comment => {
-        const cp = commentProfileMap[comment.user_id];
-        const name = cp ? (cp.display_name || cp.username) : "User";
-        commentArea.append(make("div",
-          name + ": " + (comment.content || comment.body || ""),
-          "comment"));
-      });
-      card.append(commentArea);
-
-      const commentForm = make("form");
-      const commentInput = make("input");
-      commentInput.placeholder = "Write a comment…";
-      commentInput.maxLength = 1000;
-      commentInput.required = true;
-      commentForm.append(commentInput);
-      const commentButton = make("button", "Comment");
-      commentButton.type = "submit";
-      commentForm.append(commentButton);
-      commentForm.addEventListener("submit", event => {
-        event.preventDefault();
-        runTask(async () => {
-          const { error } = await supabase.from("comments").insert({
-            post_id: post.id,
-            user_id: currentUser.id,
-            content: commentInput.value.trim()
-          });
-          if (error) throw error;
-          await loadFeed();
-          status("Comment published.");
-        });
-      });
-      card.append(commentForm);
-      fragment.append(card);
-    });
-
-    $("feed").replaceChildren(fragment);
-  }
-
-  $("authForm").addEventListener("submit", event => {
-    event.preventDefault();
-    runTask(async () => {
-      const email = $("email").value.trim();
-      const password = $("password").value;
-
-      status("Logging in…");
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email, password
-      });
-
-      if (error) throw error;
-      currentUser = data.user;
-      await openUser();
-      status("Welcome back to Vibe!");
-    });
+function status(message, isError = false) {
+  $("status").textContent = message;
+  $("status").classList.toggle("error", isError);
+  $("status").classList.remove("hidden");
+}
+function showApp(signedIn) {
+  $("authCard").classList.toggle("hidden", signedIn);
+  $("appArea").classList.toggle("hidden", !signedIn);
+  $("status").classList.remove("hidden");
+  $("logoutBtn").classList.toggle("hidden", !signedIn);
+}
+function setBusy(value) {
+  busy = value;
+  document.querySelectorAll("button").forEach(b => b.disabled = value);
+}
+function friendlyError(error) {
+  console.error("Vibe error:", error);
+  status(error && error.message ? error.message : String(error), true);
+}
+async function runTask(task) {
+  if (busy) return;
+  setBusy(true);
+  try { await task(); }
+  catch (error) { friendlyError(error); }
+  finally { setBusy(false); }
+}
+function make(tag, text, className) {
+  const e = document.createElement(tag);
+  if (text !== undefined) e.textContent = text;
+  if (className) e.className = className;
+  return e;
+}
+function initials(name) {
+  return (name || "V").trim().slice(0,1).toUpperCase();
+}
+function syncProfileUI() {
+  const name = currentProfile && (currentProfile.display_name || currentProfile.username) || "Vibe member";
+  const username = currentProfile && currentProfile.username || "member";
+  $("profileName").textContent = name;
+  $("displayName").value = currentProfile.display_name || "";
+  $("username").value = currentProfile.username || "";
+  $("bio").value = currentProfile.bio || "";
+  $("composerName").textContent = name;
+  $("composerAvatar").textContent = initials(name);
+  $("profileAvatar").textContent = initials(name);
+  $("sideAvatar").textContent = initials(name);
+  $("sideName").textContent = name;
+  $("sideHandle").textContent = "@" + username;
+}
+async function loadProfile() {
+  const {data,error} = await supabase.from("profiles").select("*").eq("id",currentUser.id).maybeSingle();
+  if (error) throw error;
+  if (!data) {
+    const base = (currentUser.email || "vibeuser").split("@")[0].toLowerCase().replace(/[^a-z0-9_]/g,"").slice(0,18) || "vibeuser";
+    const result = await supabase.from("profiles").upsert({
+      id:currentUser.id, username:base+"_"+currentUser.id.slice(0,5),
+      display_name:base, bio:"", created_at:new Date().toISOString()
+    },{onConflict:"id"}).select().single();
+    if (result.error) throw result.error;
+    currentProfile = result.data;
+  } else currentProfile = data;
+  syncProfileUI();
+}
+function renderSearchResults(query) {
+  const target = $("searchResults");
+  target.replaceChildren();
+  const q = query.trim().toLowerCase();
+  if (!q) { target.textContent = "Type to search your feed."; return; }
+  const results = feedPosts.filter(p => {
+    const author = p._author || {};
+    return (p.content || p.body || "").toLowerCase().includes(q) ||
+      (author.username || "").toLowerCase().includes(q) ||
+      (author.display_name || "").toLowerCase().includes(q);
   });
-
-  $("signupBtn").addEventListener("click", () => runTask(async () => {
-    const email = $("email").value.trim();
-    const password = $("password").value;
-    if (!email || password.length < 6) {
-      status("Enter a valid email and a password of at least 6 characters.", true);
-      return;
-    }
-
-    status("Creating your account…");
-    const { data, error } = await supabase.auth.signUp({
-      email, password,
-      options: {
-        emailRedirectTo: location.origin
-      }
-    });
-
-    if (error) throw error;
-
-    if (data.session && data.user) {
-      currentUser = data.user;
-      await openUser();
-      status("Account created. Welcome to Vibe!");
-    } else {
-      status("Account created! Check your email for the confirmation link, then return here and log in.");
-    }
-  }));
-
-  $("profileForm").addEventListener("submit", event => {
-    event.preventDefault();
-    runTask(async () => {
-      const username = $("username").value.trim().toLowerCase();
-      const display_name = $("displayName").value.trim();
-      const bio = $("bio").value.trim();
-
-      if (!/^[a-z0-9_]{3,30}$/.test(username)) {
-        status("Username must be 3–30 characters: letters, numbers, underscores.", true);
-        return;
-      }
-
-      const { data, error } = await supabase.from("profiles").upsert({
-        id: currentUser.id, username, display_name, bio
-      }, { onConflict: "id" }).select().single();
-
-      if (error) throw error;
-      currentProfile = data;
-      $("profileName").textContent = display_name;
-      status("Profile saved!");
-    });
+  if (!results.length) { target.textContent = "No matching posts in the loaded feed."; return; }
+  results.forEach(p => {
+    const card = make("div",undefined,"comment");
+    card.append(make("strong",(p._author && (p._author.display_name || p._author.username)) || "Vibe user"));
+    card.append(make("p",p.content || p.body || ""));
+    target.append(card);
   });
-
-  $("postForm").addEventListener("submit", event => {
-    event.preventDefault();
-    runTask(async () => {
-      const content = $("postText").value.trim();
-      if (!content) return;
-      status("Publishing post…");
-
-      const { error } = await supabase.from("posts").insert({
-        user_id: currentUser.id,
-        content
-      });
-
-      if (error) throw error;
-      $("postText").value = "";
-      await loadFeed();
-      status("Your post is live!");
-    });
-  });
-
-  $("logoutBtn").addEventListener("click", () => runTask(async () => {
-    const { error } = await supabase.auth.signOut();
-    if (error) throw error;
-    currentUser = null;
-    currentProfile = null;
-    showApp(false);
-    status("You have logged out.");
-  }));
-
-  async function openUser() {
-    showApp(true);
-    await loadProfile();
-    await loadFeed();
+}
+async function loadFeed() {
+  $("feed").replaceChildren(make("p","Loading posts…","muted"));
+  const {data:posts,error} = await supabase.from("posts").select("*").order("created_at",{ascending:false}).limit(50);
+  if (error) throw error;
+  feedPosts = posts || [];
+  if (!feedPosts.length) {
+    $("feed").replaceChildren();
+    const empty = make("div",undefined,"card empty");
+    empty.append(make("div","✦","empty-icon"),make("h2","Your feed starts here"),make("p","No posts yet. Share the first thought with your community."));
+    $("feed").append(empty);
+    renderSearchResults($("feedSearch").value);
+    return;
   }
-
-  async function start() {
-    status("Loading Supabase library…");
-
-    if (!window.supabase || !window.supabase.createClient) {
-      throw new Error(
-        "Supabase library did not load. Check your internet connection, then reload the page."
-      );
-    }
-
-    supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-    status("Connecting to Vibe…");
-
-    const { data, error } = await supabase.auth.getSession();
-    if (error) throw error;
-
-    if (data.session && data.session.user) {
-      currentUser = data.session.user;
-      await openUser();
-      status("Welcome back to Vibe!");
-    } else {
-      showApp(false);
-      status("Ready. Log in or create your account.");
-    }
-
-    supabase.auth.onAuthStateChange((_event, session) => {
-      if (session && session.user && !currentUser) {
-        currentUser = session.user;
-        openUser().catch(friendlyError);
-      }
-    });
+  const ids = feedPosts.map(p => p.id);
+  const authorIds = [...new Set(feedPosts.map(p => p.user_id))];
+  const {data:profiles,error:pe} = await supabase.from("profiles").select("id,username,display_name").in("id",authorIds);
+  if (pe) throw pe;
+  const profileMap = Object.fromEntries((profiles || []).map(p => [p.id,p]));
+  feedPosts.forEach(p => p._author = profileMap[p.user_id]);
+  const {data:likes,error:le} = await supabase.from("likes").select("post_id,user_id").in("post_id",ids);
+  if (le) throw le;
+  const {data:comments,error:ce} = await supabase.from("comments").select("*").in("post_id",ids).order("created_at",{ascending:true});
+  if (ce) throw ce;
+  const commentIds = [...new Set((comments || []).map(c => c.user_id))];
+  let commentMap = {};
+  if (commentIds.length) {
+    const {data:cp,error:cpe} = await supabase.from("profiles").select("id,username,display_name").in("id",commentIds);
+    if (cpe) throw cpe;
+    commentMap = Object.fromEntries((cp || []).map(p => [p.id,p]));
   }
-
-  window.addEventListener("error", event => {
-    status("JavaScript error: " + (event.message || "Unknown error"), true);
-  });
-
-  window.addEventListener("unhandledrejection", event => {
-    const reason = event.reason;
-    status("App error: " + (reason && reason.message
-      ? reason.message : String(reason)), true);
-  });
-
-  // Load Supabase first, then start the app.
-  const library = document.createElement("script");
-  library.src = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2";
-  library.onload = () => start().catch(friendlyError);
-  library.onerror = () => status(
-    "Could not load Supabase. Check your connection or CDN access and reload.",
-    true
-  );
-  document.head.appendChild(library);
-})();
-</script>
-</body>
-</html>
+  const fragment = document.createDocumentFragment();
+  feedPosts.forEach(post => {
+    const author = post._author || {};
+    const name = author.display_name || author.username || "Vibe user";
+    const card = make("article",undefined,"card post-card");
+    const head = make("div",undefined,"post-head");
+    const authorBlock = make("div",undefined,"author");
+    authorBlock.append(make("div",initials(name),"avatar small"));
+    const identity = make("div");
+    identity.append(make("strong",name),make("div","@"+(author.username || "member"),"profile-handle"));
+    authorBlock.append(identity);
+    head.append(authorBlock,make("span",post.created_at ? new Date(post.created_at).toLocaleDateString() : "Just now","post-date"));
+    card.append(head,make("div",post.content || post.body || "","post"));
+    const postLikes = (likes || []).filter(l => l.post_id 
