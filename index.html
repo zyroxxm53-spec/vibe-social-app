@@ -362,4 +362,381 @@ async function loadFeed(){
     const form=make("form",undefined,"comment-form");
     const input=make("input");
     input.placeholder="Write a comment…";
-    input
+    input 
+t.type="text";
+    input.required=true;
+
+    const submit=make("button","Send","primary");
+    submit.type="submit";
+
+    form.append(input,submit);
+
+    form.addEventListener("submit",async e=>{
+      e.preventDefault();
+
+      const content=input.value.trim();
+      if(!content) return;
+
+      await runTask(async()=>{
+        const {error}=await supabase
+          .from("comments")
+          .insert({
+            post_id:post.id,
+            user_id:currentUser.id,
+            content:content
+          });
+
+        if(error) throw error;
+
+        input.value="";
+        await loadFeed();
+        status("Comment added successfully.");
+      });
+    });
+
+    card.append(form);
+    feed.append(card);
+  });
+}
+
+function status(message){
+  const el=document.getElementById("status");
+  if(el) el.textContent=message;
+}
+
+async function toggleLike(postId){
+  await runTask(async()=>{
+    const {data,error}=await supabase
+      .from("likes")
+      .select("id")
+      .eq("post_id",postId)
+      .eq("user_id",currentUser.id)
+      .maybeSingle();
+
+    if(error) throw error;
+
+    if(data){
+      const result=await supabase
+        .from("likes")
+        .delete()
+        .eq("id",data.id);
+
+      if(result.error) throw result.error;
+    }else{
+      const result=await supabase
+        .from("likes")
+        .insert({
+          post_id:postId,
+          user_id:currentUser.id
+        });
+
+      if(result.error) throw result.error;
+    }
+
+    await loadFeed();
+  });
+}
+
+async function createPost(){
+  const input=document.getElementById("postContent");
+  const content=input.value.trim();
+
+  if(!content) return status("Write something first.");
+
+  await runTask(async()=>{
+    const {error}=await supabase
+      .from("posts")
+      .insert({
+        user_id:currentUser.id,
+        content:content
+      });
+
+    if(error) throw error;
+
+    input.value="";
+    await loadFeed();
+    status("Your post has been published!");
+  });
+}
+
+async function saveProfile(){
+  const username=document.getElementById("editUsername").value.trim().toLowerCase();
+  const displayName=document.getElementById("editDisplayName").value.trim();
+  const bio=document.getElementById("editBio").value.trim();
+
+  if(!username || !displayName){
+    return status("Username and display name are required.");
+  }
+
+  await runTask(async()=>{
+    const {error}=await supabase
+      .from("profiles")
+      .upsert({
+        id:currentUser.id,
+        username,
+        display_name:displayName,
+        bio
+      });
+
+    if(error) throw error;
+
+    await loadProfile();
+    status("Profile updated successfully.");
+  });
+}
+
+async function searchUsers(){
+  const input=document.getElementById("searchInput");
+  const query=input.value.trim().toLowerCase();
+  const results=document.getElementById("searchResults");
+
+  if(!query){
+    results.innerHTML="";
+    return;
+  }
+
+  await runTask(async()=>{
+    const {data,error}=await supabase
+      .from("profiles")
+      .select("id,username,display_name,bio,avatar_url")
+      .or(`username.ilike.%${query}%,display_name.ilike.%${query}%`)
+      .limit(20);
+
+    if(error) throw error;
+
+    results.innerHTML="";
+
+    (data||[]).forEach(profile=>{
+      const item=make("div",undefined,"search-result");
+      const name=make("strong",profile.display_name||profile.username);
+      const handle=make("p","@"+profile.username);
+
+      item.append(name,handle);
+
+      item.addEventListener("click",()=>{
+        openUser(profile.id);
+      });
+
+      results.append(item);
+    });
+
+    if(!data||!data.length){
+      results.textContent="No users found.";
+    }
+  });
+}
+
+function showPanel(panelId){
+  document.querySelectorAll(".panel").forEach(panel=>{
+    panel.classList.add("hidden");
+  });
+
+  const panel=document.getElementById(panelId);
+  if(panel) panel.classList.remove("hidden");
+}
+
+function showApp(loggedIn){
+  document.getElementById("authSection").classList.toggle("hidden",loggedIn);
+  document.getElementById("appSection").classList.toggle("hidden",!loggedIn);
+}
+
+async function openUser(userId){
+  if(!userId){
+    showPanel("homePanel");
+    await loadFeed();
+    return;
+  }
+
+  const {data,error}=await supabase
+    .from("profiles")
+    .select("*")
+    .eq("id",userId)
+    .maybeSingle();
+
+  if(error) throw error;
+
+  if(!data) return status("Profile not found.");
+
+  document.getElementById("profileName").textContent=data.display_name||data.username;
+  document.getElementById("profileUsername").textContent="@"+data.username;
+  document.getElementById("profileBio").textContent=data.bio||"";
+
+  showPanel("profilePanel");
+}
+
+function friendlyError(error){
+  console.error(error);
+  status(error?.message||"Something went wrong. Please try again.");
+}
+
+async function runTask(task){
+  try{
+    await task();
+  }catch(error){
+    friendlyError(error);
+  }
+}
+
+function make(tag,text,className){
+  const element=document.createElement(tag);
+  if(text!==undefined&&text!==null){
+    element.textContent=text;
+  }
+  if(className) element.className=className;
+  return element;
+}
+
+async function start(){
+  try{
+    const {data,error}=await supabase.auth.getSession();
+    if(error) throw error;
+
+    if(data.session){
+      currentUser=data.session.user;
+      showApp(true);
+
+      try{
+        await loadProfile();
+        await loadFeed();
+      }catch(error){
+        friendlyError(error);
+      }
+    }else{
+      showApp(false);
+    }
+
+    supabase.auth.onAuthStateChange(async(event,session)=>{
+      currentUser=session?.user||null;
+      showApp(!!currentUser);
+
+      if(currentUser){
+        try{
+          await loadProfile();
+          await loadFeed();
+        }catch(error){
+          friendlyError(error);
+        }
+      }
+    });
+
+  }catch(error){
+    friendlyError(error);
+    showApp(false);
+  }
+}
+
+document.getElementById("loginForm").addEventListener("submit",async event=>{
+  event.preventDefault();
+
+  const email=document.getElementById("loginEmail").value.trim();
+  const password=document.getElementById("loginPassword").value;
+
+  await runTask(async()=>{
+    const {data,error}=await supabase.auth.signInWithPassword({
+      email,
+      password
+    });
+
+    if(error) throw error;
+
+    currentUser=data.user;
+    showApp(true);
+
+    try{
+      await loadProfile();
+      await loadFeed();
+      status("Welcome back to Vibe!");
+    }catch(error){
+      friendlyError(error);
+    }
+  });
+});
+
+document.getElementById("signupForm").addEventListener("submit",async event=>{
+  event.preventDefault();
+
+  const email=document.getElementById("signupEmail").value.trim();
+  const password=document.getElementById("signupPassword").value;
+  const username=document.getElementById("signupUsername").value.trim().toLowerCase();
+  const displayName=document.getElementById("signupDisplayName").value.trim();
+
+  await runTask(async()=>{
+    const {data,error}=await supabase.auth.signUp({
+      email,
+      password,
+      options:{
+        data:{
+          username,
+          display_name:displayName
+        }
+      }
+    });
+
+    if(error) throw error;
+
+    if(data.session){
+      currentUser=data.user;
+      showApp(true);
+
+      try{
+        await loadProfile();
+        await loadFeed();
+      }catch(error){
+        friendlyError(error);
+      }
+    }else{
+      status("Account created! Check your email to confirm your account, then log in.");
+    }
+  });
+});
+
+document.getElementById("logoutBtn").addEventListener("click",async()=>{
+  await runTask(async()=>{
+    const {error}=await supabase.auth.signOut();
+    if(error) throw error;
+    currentUser=null;
+    showApp(false);
+    status("You have logged out.");
+  });
+});
+
+document.getElementById("createPostBtn").addEventListener("click",createPost);
+document.getElementById("saveProfileBtn").addEventListener("click",saveProfile);
+document.getElementById("searchInput").addEventListener("input",searchUsers);
+
+document.querySelectorAll("[data-panel]").forEach(button=>{
+  button.addEventListener("click",()=>{
+    showPanel(button.dataset.panel);
+
+    if(button.dataset.panel==="homePanel"){
+      loadFeed().catch(friendlyError);
+    }
+  });
+});
+
+document.getElementById("editProfileBtn").addEventListener("click",()=>{
+  showPanel("editProfilePanel");
+});
+
+document.getElementById("cancelEditBtn").addEventListener("click",()=>{
+  showPanel("profilePanel");
+});
+
+document.getElementById("homeBtn").addEventListener("click",()=>{
+  showPanel("homePanel");
+  loadFeed().catch(friendlyError);
+});
+
+document.getElementById("exploreBtn").addEventListener("click",()=>{
+  showPanel("explorePanel");
+});
+
+document.getElementById("profileBtn").addEventListener("click",()=>{
+  showPanel("profilePanel");
+});
+
+document.getElementById("messagesBtn").addEventListener("click",()=>{
+  showPanel("messagesPanel");
+});
+
+start();
