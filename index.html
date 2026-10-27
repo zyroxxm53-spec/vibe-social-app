@@ -33,7 +33,7 @@ main{max-width:650px;margin:22px auto;padding:0 14px 100px}
 .button-row{display:flex;gap:8px;flex-wrap:wrap}
 .button-row button{flex:1}
 .secondary{background:#eeeefe;color:var(--blue)}
-#avatarPreview{display:block;width:100px;height:100px;border-radius:50%;object-fit:cover;margin:8px auto 14px}
+#avatarPreview{width:100px;height:100px;border-radius:50%;object-fit:cover;margin:8px auto 14px}
 footer{position:fixed;z-index:3;bottom:0;left:0;right:0;background:white;border-top:1px solid var(--line);display:flex;justify-content:center;gap:8px;padding:10px}
 footer button{background:white;color:#555;flex:1;max-width:150px}
 .hint{font-size:12px;color:var(--muted);line-height:1.5;margin-top:-5px}
@@ -77,10 +77,9 @@ footer button{background:white;color:#555;flex:1;max-width:150px}
 
       <form id="profileForm" class="hidden">
         <h3>Edit your profile</h3>
-
         <label for="avatarFile">Profile picture</label>
         <input id="avatarFile" type="file" accept="image/jpeg,image/png,image/webp">
-        <p class="hint">Choose a JPG, PNG or WebP image up to 2 MB.</p>
+        <p class="hint">JPG, PNG or WebP, maximum 2 MB.</p>
         <img id="avatarPreview" class="hidden" alt="Profile picture preview">
 
         <label for="displayNameInput">Display name</label>
@@ -88,10 +87,10 @@ footer button{background:white;color:#555;flex:1;max-width:150px}
 
         <label for="usernameInput">Username</label>
         <input id="usernameInput" maxlength="20" minlength="3" required placeholder="your_username" autocomplete="username">
-        <p class="hint">Use 3–20 letters, numbers or underscores. Usernames must be unique.</p>
+        <p class="hint">3–20 letters, numbers or underscores. Usernames must be unique.</p>
 
         <label for="bioInput">Bio</label>
-        <textarea id="bioInput" maxlength="160" rows="3" placeholder="Tell people a little about yourself"></textarea>
+        <textarea id="bioInput" maxlength="160" rows="3" placeholder="Tell people about yourself"></textarea>
 
         <div class="button-row">
           <button id="saveProfileBtn" type="submit">Save profile</button>
@@ -138,8 +137,8 @@ import { createClient } from
 const SUPABASE_URL = "https://nmslfnhbqprwpsxacuvy.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_Snp3A0a0m_2HNCQwi2uR1g_RQ6id2uH";
 
-const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
 const $ = id => document.getElementById(id);
+const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
 
 let currentUser = null;
 let currentProfile = null;
@@ -170,7 +169,7 @@ function makeAvatar(container, name, url, big = false) {
   if (safeUrl) {
     const img = document.createElement("img");
     img.src = safeUrl;
-    img.alt = name + "'s profile picture";
+    img.alt = (name || "User") + "'s profile picture";
     img.loading = "lazy";
     img.onerror = () => {
       container.replaceChildren();
@@ -186,14 +185,15 @@ function setSignedIn(user) {
   currentUser = user || null;
   $("authCard").classList.toggle("hidden", !!currentUser);
   $("appArea").classList.toggle("hidden", !currentUser);
-  $("accountLabel").textContent = currentUser
-    ? currentUser.email : "Your social space";
+  $("accountLabel").textContent =
+    currentUser ? currentUser.email : "Your social space";
 
   if (!currentUser) {
     currentProfile = null;
     allPosts = [];
     $("feed").replaceChildren();
     $("profileForm").classList.add("hidden");
+    $("editProfileBtn").classList.remove("hidden");
     $("profileInfo").textContent = "";
   } else {
     $("profileInfo").textContent = "Signed in as " + currentUser.email;
@@ -208,7 +208,7 @@ async function loadProfile() {
   if (!currentUser) return;
 
   try {
-    const {data, error} = await supabase
+    const { data, error } = await supabase
       .from("profiles")
       .select("id,username,display_name,bio,avatar_url,created_at")
       .eq("id", currentUser.id)
@@ -219,17 +219,17 @@ async function loadProfile() {
     if (data) {
       currentProfile = data;
     } else {
-      const fallbackName = (currentUser.email || "Vibe user").split("@")[0];
-      const newProfile = {
-        id: currentUser.id,
-        username: generatedUsername(),
-        display_name: fallbackName.slice(0, 50),
-        bio: ""
-      };
+      const fallbackName =
+        (currentUser.email || "Vibe user").split("@")[0];
 
-      const {data: created, error: createError} = await supabase
+      const { data: created, error: createError } = await supabase
         .from("profiles")
-        .insert(newProfile)
+        .insert({
+          id: currentUser.id,
+          username: generatedUsername(),
+          display_name: fallbackName.slice(0, 50),
+          bio: ""
+        })
         .select()
         .single();
 
@@ -248,8 +248,11 @@ function renderProfile() {
 
   const name = currentProfile.display_name || "Vibe user";
   $("profileDisplayName").textContent = name;
-  $("profileUsername").textContent = "@" + (currentProfile.username || "user");
-  $("profileBio").textContent = currentProfile.bio || "No bio yet. Tell people about yourself.";
+  $("profileUsername").textContent =
+    "@" + (currentProfile.username || "user");
+  $("profileBio").textContent =
+    currentProfile.bio || "No bio yet. Tell people about yourself.";
+
   makeAvatar($("profileAvatar"), name, currentProfile.avatar_url, true);
 
   $("displayNameInput").value = currentProfile.display_name || "";
@@ -262,84 +265,6 @@ function renderProfile() {
   $("avatarPreview").removeAttribute("src");
 }
 
-async function updateScreen() {
-  const {data, error} = await supabase.auth.getSession();
-
-  if (error) {
-    notice(error.message, true);
-    return;
-  }
-
-  setSignedIn(data.session?.user);
-
-  if (currentUser) {
-    await loadProfile();
-    await loadFeed();
-  }
-}
-
-async function signUp() {
-  const email = $("email").value.trim();
-  const password = $("password").value;
-
-  if (!email || password.length < 6) {
-    notice("Enter a valid email and a password of at least 6 characters.", true);
-    return;
-  }
-
-  $("signupBtn").disabled = true;
-  notice("Creating your account...");
-
-  try {
-    const {data, error} = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        emailRedirectTo: window.location.origin
-      }
-    });
-
-    if (error) throw error;
-
-    if (data.session) {
-      setSignedIn(data.session.user);
-      await loadProfile();
-      await loadFeed();
-      notice("Account created! Welcome to Vibe.");
-    } else {
-      notice("Account created. Check your email for confirmation, then log in.");
-    }
-  } catch (e) {
-    notice(e.message || "Account creation failed.", true);
-  } finally {
-    $("signupBtn").disabled = false;
-  }
-}
-
-async function signIn(event) {
-  event.preventDefault();
-  $("loginBtn").disabled = true;
-  notice("Logging in...");
-
-  try {
-    const {data, error} = await supabase.auth.signInWithPassword({
-      email: $("email").value.trim(),
-      password: $("password").value
-    });
-
-    if (error) throw error;
-
-    setSignedIn(data.user);
-    await loadProfile();
-    await loadFeed();
-    notice("Logged in successfully!");
-  } catch (e) {
-    notice(e.message || "Login failed.", true);
-  } finally {
-    $("loginBtn").disabled = false;
-  }
-}
-
 async function loadFeed() {
   if (!currentUser) return;
 
@@ -347,7 +272,7 @@ async function loadFeed() {
   $("feed").textContent = "Loading posts...";
 
   try {
-    const {data, error} = await supabase
+    const { data, error } = await supabase
       .from("posts")
       .select(`
         id,
@@ -361,7 +286,7 @@ async function loadFeed() {
           avatar_url
         )
       `)
-      .order("created_at", {ascending: false})
+      .order("created_at", { ascending: false })
       .limit(50);
 
     if (error) throw error;
@@ -371,8 +296,8 @@ async function loadFeed() {
     renderFeed();
   } catch (e) {
     if (request !== feedRequest) return;
-
     $("feed").replaceChildren();
+
     const box = document.createElement("div");
     box.className = "card";
     box.textContent = "Could not load posts: " + e.message;
@@ -434,11 +359,11 @@ function renderFeed() {
       card.appendChild(content);
     }
 
-    const safePostImage = safeImageUrl(post.image_url);
-    if (safePostImage) {
+    const imageUrl = safeImageUrl(post.image_url);
+    if (imageUrl) {
       const img = document.createElement("img");
       img.className = "post-image";
-      img.src = safePostImage;
+      img.src = imageUrl;
       img.alt = "Post image";
       img.loading = "lazy";
       img.referrerPolicy = "no-referrer";
@@ -454,13 +379,79 @@ function renderFeed() {
   }
 }
 
+async function signIn(event) {
+  event.preventDefault();
+  $("loginBtn").disabled = true;
+  notice("Logging in...");
+
+  try {
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: $("email").value.trim(),
+      password: $("password").value
+    });
+
+    if (error) throw error;
+
+    setSignedIn(data.user);
+    await loadProfile();
+    await loadFeed();
+    notice("Logged in successfully!");
+  } catch (e) {
+    notice(e.message || "Login failed.", true);
+  } finally {
+    $("loginBtn").disabled = false;
+  }
+}
+
+async function signUp() {
+  const email = $("email").value.trim();
+  const password = $("password").value;
+
+  if (!email || password.length < 6) {
+    notice("Enter a valid email and a password of at least 6 characters.", true);
+    return;
+  }
+
+  $("signupBtn").disabled = true;
+  notice("Creating your account...");
+
+  try {
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        emailRedirectTo: window.location.origin
+      }
+    });
+
+    if (error) throw error;
+
+    if (data.session) {
+      setSignedIn(data.session.user);
+      await loadProfile();
+      await loadFeed();
+      notice("Account created! Welcome to Vibe.");
+    } else {
+      notice("Account created. Check your email for confirmation, then log in.");
+    }
+  } catch (e) {
+    notice(e.message || "Account creation failed.", true);
+  } finally {
+    $("signupBtn").disabled = false;
+  }
+}
+
 async function uploadAvatar(file) {
   if (!currentUser) throw new Error("Please log in first.");
   if (!file) return originalAvatarUrl;
 
-  const allowedTypes = ["image/jpeg", "image/png", "image/webp"];
+  const types = {
+    "image/jpeg": "jpg",
+    "image/png": "png",
+    "image/webp": "webp"
+  };
 
-  if (!allowedTypes.includes(file.type)) {
+  if (!types[file.type]) {
     throw new Error("Choose a JPG, PNG or WebP image.");
   }
 
@@ -468,15 +459,9 @@ async function uploadAvatar(file) {
     throw new Error("Your picture must be 2 MB or smaller.");
   }
 
-  const extension = {
-    "image/jpeg": "jpg",
-    "image/png": "png",
-    "image/webp": "webp"
-  }[file.type];
+  const path = currentUser.id + "/" + Date.now() + "." + types[file.type];
 
-  const path = currentUser.id + "/" + Date.now() + "." + extension;
-
-  const {error: uploadError} = await supabase.storage
+  const { error } = await supabase.storage
     .from("avatars")
     .upload(path, file, {
       contentType: file.type,
@@ -484,41 +469,31 @@ async function uploadAvatar(file) {
       upsert: false
     });
 
-  if (uploadError) throw uploadError;
+  if (error) throw error;
 
-  const {data} = supabase.storage.from("avatars").getPublicUrl(path);
-  return data.publicUrl;
+  return supabase.storage.from("avatars").getPublicUrl(path).data.publicUrl;
 }
 
 async function saveProfile(event) {
   event.preventDefault();
-
-  if (!currentUser) {
-    notice("Please log in first.", true);
-    return;
-  }
+  if (!currentUser) return notice("Please log in first.", true);
 
   const displayName = $("displayNameInput").value.trim();
   const username = $("usernameInput").value.trim().toLowerCase();
   const bio = $("bioInput").value.trim();
   const file = $("avatarFile").files[0];
 
-  if (!displayName) {
-    notice("Please enter a display name.", true);
-    return;
-  }
+  if (!displayName) return notice("Please enter a display name.", true);
 
   if (!/^[a-z0-9_]{3,20}$/.test(username)) {
-    notice("Username must be 3–20 characters using letters, numbers or underscores.", true);
-    return;
+    return notice("Username must be 3–20 letters, numbers or underscores.", true);
   }
 
   $("saveProfileBtn").disabled = true;
   notice("Saving your profile...");
 
   try {
-    // Check whether another profile already uses this username.
-    const {data: existing, error: checkError} = await supabase
+    const { data: existing, error: checkError } = await supabase
       .from("profiles")
       .select("id")
       .eq("username", username)
@@ -526,45 +501,29 @@ async function saveProfile(event) {
       .limit(1);
 
     if (checkError) throw checkError;
+    if (existing?.length) throw new Error("That username is already taken.");
 
-    if (existing && existing.length > 0) {
-      throw new Error("That username is already taken. Choose another one.");
-    }
+    const avatarUrl = file ? await uploadAvatar(file) : originalAvatarUrl;
 
-    let avatarUrl = originalAvatarUrl;
-    if (file) avatarUrl = await uploadAvatar(file);
-
-    const changes = {
-      id: currentUser.id,
-      username,
-      display_name: displayName,
-      bio,
-      avatar_url: avatarUrl || null
-    };
-
-    const {data, error} = await supabase
+    const { data, error } = await supabase
       .from("profiles")
       .update({
-        username: changes.username,
-        display_name: changes.display_name,
-        bio: changes.bio,
-        avatar_url: changes.avatar_url
+        username,
+        display_name: displayName,
+        bio,
+        avatar_url: avatarUrl || null
       })
       .eq("id", currentUser.id)
       .select()
       .maybeSingle();
 
     if (error) throw error;
-
-    if (!data) {
-      throw new Error("Profile update was not accepted. Refresh and try again.");
-    }
+    if (!data) throw new Error("Profile update was not accepted. Refresh and try again.");
 
     currentProfile = data;
     renderProfile();
     $("profileForm").classList.add("hidden");
     $("editProfileBtn").classList.remove("hidden");
-
     notice("Profile saved successfully!");
     await loadFeed();
   } catch (e) {
@@ -576,30 +535,24 @@ async function saveProfile(event) {
 
 async function createPost(event) {
   event.preventDefault();
-
-  if (!currentUser) {
-    notice("Please log in first.", true);
-    return;
-  }
+  if (!currentUser) return notice("Please log in first.", true);
 
   const content = $("postContent").value.trim();
   const imageUrl = $("postImage").value.trim();
 
   if (!content && !imageUrl) {
-    notice("Write something or add an image URL before posting.", true);
-    return;
+    return notice("Write something or add an image URL before posting.", true);
   }
 
   if (imageUrl && !safeImageUrl(imageUrl)) {
-    notice("Please enter a valid image URL beginning with https://", true);
-    return;
+    return notice("Please enter a valid image URL.", true);
   }
 
   $("publishBtn").disabled = true;
   notice("Publishing post...");
 
   try {
-    const {error} = await supabase.from("posts").insert({
+    const { error } = await supabase.from("posts").insert({
       user_id: currentUser.id,
       content: content || null,
       image_url: imageUrl || null
@@ -619,12 +572,8 @@ async function createPost(event) {
 }
 
 async function logOut() {
-  const {error} = await supabase.auth.signOut();
-
-  if (error) {
-    notice(error.message, true);
-    return;
-  }
+  const { error } = await supabase.auth.signOut();
+  if (error) return notice(error.message, true);
 
   setSignedIn(null);
   notice("You have logged out.");
@@ -642,7 +591,7 @@ $("editProfileBtn").addEventListener("click", () => {
   renderProfile();
   $("profileForm").classList.remove("hidden");
   $("editProfileBtn").classList.add("hidden");
-  $("profileForm").scrollIntoView({behavior: "smooth", block: "start"});
+  $("profileForm").scrollIntoView({ behavior: "smooth", block: "start" });
 });
 
 $("cancelProfileBtn").addEventListener("click", () => {
@@ -657,4 +606,35 @@ $("avatarFile").addEventListener("change", () => {
 
   if (!file) {
     preview.classList.add("hidden");
-    previe
+    preview.removeAttribute("src");
+    return;
+  }
+
+  if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
+    $("avatarFile").value = "";
+    notice("Choose a JPG, PNG or WebP image.", true);
+    return;
+  }
+
+  if (file.size > 2 * 1024 * 1024) {
+    $("avatarFile").value = "";
+    notice("Your picture must be 2 MB or smaller.", true);
+    return;
+  }
+
+  preview.src = URL.createObjectURL(file);
+  preview.classList.remove("hidden");
+});
+
+$("homeBtn").addEventListener("click", () => {
+  window.scrollTo({ top: 0, behavior: "smooth" });
+});
+
+$("searchBtn").addEventListener("click", () => {
+  $("searchInput").focus();
+  $("feedSection").scrollIntoView({ behavior: "smooth", block: "center" });
+});
+
+$("profileBtn").addEventListener("click", () => {
+  $("profileCard").scrollIntoView({ behavior: "smooth", block: "start" });
+}
