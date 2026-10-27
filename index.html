@@ -12,10 +12,11 @@
 body{margin:0;background:var(--bg);color:var(--text);font:15px Arial,sans-serif}
 button,input,textarea{font:inherit}
 button{cursor:pointer;border:0;border-radius:11px;padding:11px 15px;background:var(--blue);color:white;font-weight:600}
+button:disabled{opacity:.6;cursor:wait}
 input,textarea{width:100%;padding:12px;border:1px solid var(--line);border-radius:12px;background:white;color:var(--text);margin:6px 0 12px}
-header{position:sticky;top:0;background:white;border-bottom:1px solid var(--line);padding:15px;display:flex;justify-content:space-between;align-items:center;gap:12px}
+header{position:sticky;top:0;z-index:2;background:white;border-bottom:1px solid var(--line);padding:15px;display:flex;justify-content:space-between;align-items:center;gap:12px}
 .logo{font-size:29px;font-weight:900;color:var(--blue)}
-main{max-width:650px;margin:22px auto;padding:0 14px 80px}
+main{max-width:650px;margin:22px auto;padding:0 14px 90px}
 .card{background:white;border:1px solid var(--line);border-radius:16px;padding:17px;margin-bottom:15px}
 .muted{font-size:13px;color:var(--muted)}
 .hidden{display:none!important}
@@ -23,7 +24,8 @@ main{max-width:650px;margin:22px auto;padding:0 14px 80px}
 .post-head{display:flex;align-items:center;gap:10px;margin-bottom:12px}
 .avatar{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;background:#e9e7ff;color:var(--blue);font-weight:bold;flex-shrink:0}
 .post-text{white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.55}
-footer{position:fixed;bottom:0;left:0;right:0;background:white;border-top:1px solid var(--line);display:flex;justify-content:center;gap:8px;padding:10px}
+.post-image{display:block;width:100%;max-height:500px;object-fit:contain;border-radius:12px;margin:12px 0}
+footer{position:fixed;z-index:3;bottom:0;left:0;right:0;background:white;border-top:1px solid var(--line);display:flex;justify-content:center;gap:8px;padding:10px}
 footer button{background:white;color:#555;flex:1;max-width:150px}
 </style>
 </head>
@@ -34,7 +36,7 @@ footer button{background:white;color:#555;flex:1;max-width:150px}
 </header>
 
 <main>
-  <div id="notice" role="status"></div>
+  <div id="notice" role="status" aria-live="polite"></div>
 
   <section id="authCard" class="card">
     <h2>Welcome to Vibe</h2>
@@ -53,7 +55,8 @@ footer button{background:white;color:#555;flex:1;max-width:150px}
     <div class="card">
       <h2>What's happening?</h2>
       <form id="postForm">
-        <textarea id="postContent" maxlength="2000" placeholder="Share something with your people..." required></textarea>
+        <textarea id="postContent" maxlength="2000" placeholder="Share something with your people..."></textarea>
+        <input id="postImage" type="url" placeholder="Image URL (optional)">
         <button id="publishBtn" type="submit">Share post</button>
       </form>
     </div>
@@ -66,7 +69,7 @@ footer button{background:white;color:#555;flex:1;max-width:150px}
 
     <div id="feed"></div>
 
-    <div class="card">
+    <div class="card" id="profileCard">
       <h2>Your account</h2>
       <p id="profileInfo" class="muted"></p>
       <button id="logoutBtn" type="button">Log out</button>
@@ -88,42 +91,50 @@ const SUPABASE_URL = "https://nmslfnhbqprwpsxacuvy.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_Snp3A0a0m_2HNCQwi2uR1g_RQ6id2uH";
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
-
 const $ = id => document.getElementById(id);
+
 let currentUser = null;
 let allPosts = [];
+let feedRequest = 0;
 
 function notice(message, error = false) {
   $("notice").textContent = message;
   $("notice").style.color = error ? "#c0392b" : "#27834a";
 }
 
-function escapeHTML(value = "") {
-  return String(value).replace(/[&<>"']/g, c => ({
-    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
-  })[c]);
+function setSignedIn(user) {
+  currentUser = user || null;
+  $("authCard").classList.toggle("hidden", !!currentUser);
+  $("appArea").classList.toggle("hidden", !currentUser);
+  $("accountLabel").textContent = currentUser
+    ? currentUser.email : "Your social space";
+
+  if (currentUser) {
+    $("profileInfo").textContent = "Signed in as " + currentUser.email;
+  } else {
+    allPosts = [];
+    $("feed").replaceChildren();
+  }
 }
 
 async function updateScreen() {
   const {data, error} = await supabase.auth.getSession();
-  if (error) return notice(error.message, true);
-
-  currentUser = data.session?.user || null;
-  $("authCard").classList.toggle("hidden", !!currentUser);
-  $("appArea").classList.toggle("hidden", !currentUser);
-  $("accountLabel").textContent = currentUser ? currentUser.email : "Your social space";
-
-  if (currentUser) {
-    $("profileInfo").textContent = "Signed in as " + currentUser.email;
-    await loadFeed();
+  if (error) {
+    notice(error.message, true);
+    return;
   }
+
+  setSignedIn(data.session?.user);
+  if (currentUser) await loadFeed();
 }
 
 async function signUp() {
   const email = $("email").value.trim();
   const password = $("password").value;
+
   if (!email || password.length < 6) {
-    return notice("Enter a valid email and a password of at least 6 characters.", true);
+    notice("Enter a valid email and a password of at least 6 characters.", true);
+    return;
   }
 
   $("signupBtn").disabled = true;
@@ -134,10 +145,11 @@ async function signUp() {
     if (error) throw error;
 
     if (data.session) {
+      setSignedIn(data.session.user);
       notice("Account created! Welcome to Vibe.");
-      await updateScreen();
+      await loadFeed();
     } else {
-      notice("Account created. Check your email for a confirmation link, then log in.");
+      notice("Account created. Check your email for confirmation, then log in.");
     }
   } catch (e) {
     notice(e.message || "Account creation failed.", true);
@@ -152,13 +164,15 @@ async function signIn(event) {
   notice("Logging in...");
 
   try {
-    const {error} = await supabase.auth.signInWithPassword({
+    const {data, error} = await supabase.auth.signInWithPassword({
       email: $("email").value.trim(),
       password: $("password").value
     });
     if (error) throw error;
+
+    setSignedIn(data.user);
     notice("Logged in successfully!");
-    await updateScreen();
+    await loadFeed();
   } catch (e) {
     notice(e.message || "Login failed.", true);
   } finally {
@@ -167,20 +181,37 @@ async function signIn(event) {
 }
 
 async function loadFeed() {
+  if (!currentUser) return;
+
+  const request = ++feedRequest;
   $("feed").textContent = "Loading posts...";
 
   try {
     const {data, error} = await supabase
       .from("posts")
-      .select("id,user_id,content,created_at,profiles(username,display_name)")
-      .order("created_at", {ascending:false})
+      .select(`
+        id,
+        user_id,
+        content,
+        image_url,
+        created_at,
+        profiles!posts_user_id_fkey (
+          username,
+          display_name
+        )
+      `)
+      .order("created_at", {ascending: false})
       .limit(50);
 
     if (error) throw error;
+    if (request !== feedRequest) return;
+
     allPosts = data || [];
     renderFeed();
   } catch (e) {
-    $("feed").textContent = "";
+    if (request !== feedRequest) return;
+
+    $("feed").replaceChildren();
     const box = document.createElement("div");
     box.className = "card";
     box.textContent = "Could not load posts: " + e.message;
@@ -190,26 +221,33 @@ async function loadFeed() {
 
 function renderFeed() {
   const query = $("searchInput").value.trim().toLowerCase();
+
   const posts = allPosts.filter(post => {
-    const profile = Array.isArray(post.profiles) ? post.profiles[0] : post.profiles;
+    const profile = post.profiles;
+    const name = profile?.display_name || "";
+    const username = profile?.username || "";
+
     return (post.content || "").toLowerCase().includes(query) ||
-      (profile?.username || "").toLowerCase().includes(query) ||
-      (profile?.display_name || "").toLowerCase().includes(query);
+      username.toLowerCase().includes(query) ||
+      name.toLowerCase().includes(query);
   });
 
-  $("feed").innerHTML = "";
+  $("feed").replaceChildren();
 
   if (!posts.length) {
     const box = document.createElement("div");
     box.className = "card muted";
-    box.textContent = query ? "No matching posts found." : "No posts yet. Be the first to share!";
+    box.textContent = query
+      ? "No matching posts found."
+      : "No posts yet. Be the first to share!";
     $("feed").appendChild(box);
     return;
   }
 
-  posts.forEach(post => {
-    const profile = Array.isArray(post.profiles) ? post.profiles[0] : post.profiles;
-    const name = profile?.display_name || profile?.username || "Vibe user";
+  for (const post of posts) {
+    const profile = post.profiles || {};
+    const name = profile.display_name || profile.username || "Vibe user";
+
     const card = document.createElement("article");
     card.className = "card";
 
@@ -223,42 +261,90 @@ function renderFeed() {
     const details = document.createElement("div");
     const title = document.createElement("strong");
     title.textContent = name;
+
     const username = document.createElement("div");
     username.className = "muted";
-    username.textContent = "@" + (profile?.username || "user");
+    username.textContent = "@" + (profile.username || "user");
+
     details.append(title, username);
     head.append(avatar, details);
 
-    const content = document.createElement("p");
-    content.className = "post-text";
-    content.textContent = post.content || "";
+    card.appendChild(head);
+
+    if (post.content) {
+      const content = document.createElement("p");
+      content.className = "post-text";
+      content.textContent = post.content;
+      card.appendChild(content);
+    }
+
+    if (post.image_url) {
+      try {
+        const parsed = new URL(post.image_url);
+        if (parsed.protocol === "https:" || parsed.protocol === "http:") {
+          const img = document.createElement("img");
+          img.className = "post-image";
+          img.src = parsed.href;
+          img.alt = "Post image";
+          img.loading = "lazy";
+          img.referrerPolicy = "no-referrer";
+          card.appendChild(img);
+        }
+      } catch {}
+    }
 
     const time = document.createElement("div");
     time.className = "muted";
     time.textContent = new Date(post.created_at).toLocaleString();
+    card.appendChild(time);
 
-    card.append(head, content, time);
     $("feed").appendChild(card);
-  });
+  }
 }
 
 async function createPost(event) {
   event.preventDefault();
-  if (!currentUser) return notice("Please log in first.", true);
+
+  if (!currentUser) {
+    notice("Please log in first.", true);
+    return;
+  }
 
   const content = $("postContent").value.trim();
-  if (!content) return notice("Write something before posting.", true);
+  const imageUrl = $("postImage").value.trim();
+
+  if (!content && !imageUrl) {
+    notice("Write something or add an image URL before posting.", true);
+    return;
+  }
+
+  if (imageUrl) {
+    try {
+      const parsed = new URL(imageUrl);
+      if (!["https:", "http:"].includes(parsed.protocol)) {
+        throw new Error("Invalid protocol");
+      }
+    } catch {
+      notice("Please enter a valid image URL beginning with https://", true);
+      return;
+    }
+  }
 
   $("publishBtn").disabled = true;
+  notice("Publishing post...");
 
   try {
-    const {error} = await supabase.from("posts").insert({
+    const post = {
       user_id: currentUser.id,
-      content
-    });
+      content: content || null,
+      image_url: imageUrl || null
+    };
+
+    const {error} = await supabase.from("posts").insert(post);
     if (error) throw error;
 
     $("postContent").value = "";
+    $("postImage").value = "";
     notice("Your post has been published!");
     await loadFeed();
   } catch (e) {
@@ -270,12 +356,14 @@ async function createPost(event) {
 
 async function logOut() {
   const {error} = await supabase.auth.signOut();
-  if (error) return notice(error.message, true);
-  currentUser = null;
-  allPosts = [];
-  $("feed").innerHTML = "";
+
+  if (error) {
+    notice(error.message, true);
+    return;
+  }
+
+  setSignedIn(null);
   notice("You have logged out.");
-  await updateScreen();
 }
 
 $("authForm").addEventListener("submit", signIn);
@@ -284,18 +372,21 @@ $("postForm").addEventListener("submit", createPost);
 $("refreshBtn").addEventListener("click", loadFeed);
 $("searchInput").addEventListener("input", renderFeed);
 $("logoutBtn").addEventListener("click", logOut);
-$("homeBtn").addEventListener("click", () => window.scrollTo({top:0,behavior:"smooth"}));
-$("searchBtn").addEventListener("click", () => $("searchInput").focus());
-$("profileBtn").addEventListener("click", () => $("profileInfo").scrollIntoView({behavior:"smooth"}));
+$("homeBtn").addEventListener("click", () => {
+  window.scrollTo({top: 0, behavior: "smooth"});
+});
+$("searchBtn").addEventListener("click", () => {
+  $("searchInput").focus();
+  $("searchInput").scrollIntoView({behavior: "smooth", block: "center"});
+});
+$("profileBtn").addEventListener("click", () => {
+  $("profileCard").scrollIntoView({behavior: "smooth"});
+});
 
 supabase.auth.onAuthStateChange((_event, session) => {
-  currentUser = session?.user || null;
-  $("authCard").classList.toggle("hidden", !!currentUser);
-  $("appArea").classList.toggle("hidden", !currentUser);
-  $("accountLabel").textContent = currentUser ? currentUser.email : "Your social space";
-  if (currentUser) {
-    $("profileInfo").textContent = "Signed in as " + currentUser.email;
-    loadFeed();
+  setSignedIn(session?.user);
+  if (session?.user) {
+    setTimeout(() => loadFeed(), 0);
   }
 });
 
