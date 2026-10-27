@@ -7,473 +7,299 @@
 <meta name="theme-color" content="#ffffff">
 <title>Vibe — Connect your world</title>
 <style>
-:root{--blue:#5145e5;--bg:#f7f8fc;--text:#191a24;--muted:#777b8c;--line:#e8eaf1;--white:#fff}
+:root{--blue:#5145e5;--bg:#f7f8fc;--text:#191a24;--muted:#777b8c;--line:#e8eaf1}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--text);font:15px Arial,sans-serif}
 button,input,textarea{font:inherit}
 button{cursor:pointer;border:0;border-radius:11px;padding:11px 15px;background:var(--blue);color:white;font-weight:600}
-button:active{opacity:.8}
-input,textarea{width:100%;padding:12px;border:1px solid var(--line);border-radius:12px;background:white;color:var(--text);outline-color:var(--blue)}
-header{height:70px;position:sticky;top:0;z-index:5;background:white;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:12px;padding:0 max(15px,calc((100% - 900px)/2))}
-.logo{font-size:29px;font-weight:900;letter-spacing:-1.5px;color:var(--blue)}
-.searchbox{max-width:350px;flex:1}
-.searchbox input{background:#f7f7fb;border:0}
-main{max-width:650px;margin:24px auto;padding:0 14px 100px}
-h2{font-size:22px;margin:0 0 17px}
-h3{font-size:15px;margin:0 0 5px}
-p{line-height:1.55;overflow-wrap:anywhere}
-.card{background:white;border:1px solid var(--line);border-radius:18px;padding:17px;margin-bottom:15px}
-.row{display:flex;align-items:center;gap:11px}
-.avatar{width:44px;height:44px;border-radius:50%;flex-shrink:0;display:grid;place-items:center;background:#e9e7ff;color:var(--blue);font-weight:800;font-size:18px}
+input,textarea{width:100%;padding:12px;border:1px solid var(--line);border-radius:12px;background:white;color:var(--text);margin:6px 0 12px}
+header{position:sticky;top:0;background:white;border-bottom:1px solid var(--line);padding:15px;display:flex;justify-content:space-between;align-items:center;gap:12px}
+.logo{font-size:29px;font-weight:900;color:var(--blue)}
+main{max-width:650px;margin:22px auto;padding:0 14px 80px}
+.card{background:white;border:1px solid var(--line);border-radius:16px;padding:17px;margin-bottom:15px}
 .muted{font-size:13px;color:var(--muted)}
-.composer{margin-bottom:18px}
-.composer-bottom{display:flex;justify-content:flex-end;margin-top:12px}
-nav{display:flex;gap:8px;overflow-x:auto;padding:0 0 15px}
-nav button{white-space:nowrap}
-button.secondary{background:#f0f1f8;color:#454556}
-nav button.active{background:#252344;color:white}
-.post-text{white-space:pre-wrap;overflow-wrap:anywhere;margin:17px 0}
-.actions{display:flex;flex-wrap:wrap;gap:6px;border-top:1px solid var(--line);padding-top:12px}
-.actions button{background:white;color:#59596a;padding:8px 10px;font-size:13px}
-.actions button.liked{color:#e04470}
-.comment{margin-top:8px;background:#f5f6fb;padding:10px;border-radius:11px;overflow-wrap:anywhere}
-.comment-form{display:flex;gap:7px;margin-top:10px}
-.comment-form button{padding:9px 12px}
 .hidden{display:none!important}
-.empty{text-align:center;color:var(--muted);padding:35px 10px}
-#notice{color:var(--blue);font-size:13px;margin-bottom:10px}
-.profile-bio{color:var(--muted);margin:13px 0}
-.field-label{display:block;color:var(--muted);font-size:13px;margin:12px 0 6px}
-footer{position:fixed;z-index:6;bottom:0;left:0;right:0;background:white;border-top:1px solid var(--line);display:flex;justify-content:center;gap:8px;padding:9px 5px calc(9px + env(safe-area-inset-bottom))}
-footer button{flex:1;max-width:150px;background:white;color:#656579;padding:12px 3px;font-size:12px}
-footer button.active{background:#eeedff;color:var(--blue)}
-.small-btn{padding:8px 11px;font-size:13px}
-@media(min-width:700px){footer{gap:20px}footer button{font-size:14px}}
+#notice{margin:10px 0;color:var(--blue);overflow-wrap:anywhere}
+.post-head{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.avatar{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;background:#e9e7ff;color:var(--blue);font-weight:bold;flex-shrink:0}
+.post-text{white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.55}
+footer{position:fixed;bottom:0;left:0;right:0;background:white;border-top:1px solid var(--line);display:flex;justify-content:center;gap:8px;padding:10px}
+footer button{background:white;color:#555;flex:1;max-width:150px}
 </style>
 </head>
 <body>
-
 <header>
   <div class="logo">vibe.</div>
-  <div class="searchbox">
-    <input id="search" type="search" placeholder="Search Vibe..." aria-label="Search">
-  </div>
-  <button class="small-btn" onclick="showPage('profile')">My profile</button>
+  <div id="accountLabel" class="muted">Your social space</div>
 </header>
 
 <main>
   <div id="notice" role="status"></div>
 
-  <section id="feedPage">
-    <h2>Your feed</h2>
-
-    <div class="card composer">
-      <div class="row">
-        <div class="avatar" id="composerAvatar">Y</div>
-        <input id="postInput" maxlength="2000" placeholder="What's on your mind?">
-      </div>
-      <div class="composer-bottom">
-        <button onclick="createPost()">Share post</button>
-      </div>
-    </div>
-
-    <nav>
-      <button id="allTab" class="active" onclick="setFilter('all')">For you</button>
-      <button id="followingTab" class="secondary" onclick="setFilter('following')">Following</button>
-    </nav>
-
-    <div id="posts"></div>
+  <section id="authCard" class="card">
+    <h2>Welcome to Vibe</h2>
+    <p class="muted">Create an account or log in to share with your community.</p>
+    <form id="authForm">
+      <label for="email">Email address</label>
+      <input id="email" type="email" autocomplete="email" placeholder="you@example.com" required>
+      <label for="password">Password</label>
+      <input id="password" type="password" minlength="6" autocomplete="current-password" placeholder="At least 6 characters" required>
+      <button id="loginBtn" type="submit">Log in</button>
+      <button id="signupBtn" type="button">Create account</button>
+    </form>
   </section>
 
-  <section id="searchPage" class="hidden">
-    <h2>Explore Vibe</h2>
-    <p class="muted">Discover people and posts. Try searching for a name or a topic.</p>
-    <div id="searchResults"></div>
-  </section>
-
-  <section id="messagesPage" class="hidden">
-    <h2>Messages</h2>
+  <section id="appArea" class="hidden">
     <div class="card">
-      <div style="font-size:35px;margin-bottom:12px">✉</div>
-      <h3>Your conversations</h3>
-      <p class="muted">Private messaging will be connected after we set up Supabase. This demo does not send messages to other users.</p>
+      <h2>What's happening?</h2>
+      <form id="postForm">
+        <textarea id="postContent" maxlength="2000" placeholder="Share something with your people..." required></textarea>
+        <button id="publishBtn" type="submit">Share post</button>
+      </form>
     </div>
-  </section>
 
-  <section id="profilePage" class="hidden">
-    <h2>Your profile</h2>
     <div class="card">
-      <div class="row">
-        <div class="avatar" id="profileAvatar">Y</div>
-        <div>
-          <h3 id="profileName">Your Name</h3>
-          <div id="profileStats" class="muted">0 posts</div>
-        </div>
-      </div>
-
-      <p id="profileBio" class="profile-bio">New to Vibe.</p>
-
-      <label class="field-label" for="nameInput">Display name</label>
-      <input id="nameInput" maxlength="40" placeholder="Your name">
-
-      <label class="field-label" for="bioInput">Bio</label>
-      <textarea id="bioInput" maxlength="160" rows="3" placeholder="Tell people about yourself"></textarea>
-
-      <div style="margin-top:12px">
-        <button onclick="saveProfile()">Save profile</button>
-      </div>
+      <h2>Your feed</h2>
+      <input id="searchInput" type="search" placeholder="Search posts or usernames...">
+      <button id="refreshBtn" type="button">Refresh feed</button>
     </div>
 
-    <h3 style="margin:20px 0 12px">Your posts</h3>
-    <div id="myPosts"></div>
+    <div id="feed"></div>
+
+    <div class="card">
+      <h2>Your account</h2>
+      <p id="profileInfo" class="muted"></p>
+      <button id="logoutBtn" type="button">Log out</button>
+    </div>
   </section>
 </main>
 
 <footer>
-  <button id="nav-feed" class="active" onclick="showPage('feed')">⌂ Feed</button>
-  <button id="nav-search" onclick="showPage('search')">⌕ Explore</button>
-  <button id="nav-messages" onclick="showPage('messages')">✉ Messages</button>
-  <button id="nav-profile" onclick="showPage('profile')">☺ Profile</button>
+  <button id="homeBtn" type="button">Home</button>
+  <button id="searchBtn" type="button">Search</button>
+  <button id="profileBtn" type="button">Profile</button>
 </footer>
 
-<script>
-const STORAGE_KEY = 'vibe_demo_v1';
-let page = 'feed';
-let filter = 'all';
-let noticeTimer;
+<script type="module">
+import { createClient } from
+  "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
 
-function initialData() {
-  return {
-    name: 'Your Name',
-    bio: 'New to Vibe.',
-    following: ['Alex Morgan'],
-    posts: [
-      {
-        id: 2,
-        user: 'Alex Morgan',
-        text: 'Small steps every day can lead to amazing things. Keep going!',
-        likes: [],
-        comments: []
-      },
-      {
-        id: 1,
-        user: 'Vibe Community',
-        text: 'Welcome to Vibe! ✨ A place to share your thoughts and connect.',
-        likes: [],
-        comments: []
-      }
-    ]
-  };
+const SUPABASE_URL = "https://nmslfnhbqprwpsxacuvy.supabase.co";
+const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_Snp3A0a0m_2HNCQwi2uR1g_RQ6id2uH";
+
+const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+
+const $ = id => document.getElementById(id);
+let currentUser = null;
+let allPosts = [];
+
+function notice(message, error = false) {
+  $("notice").textContent = message;
+  $("notice").style.color = error ? "#c0392b" : "#27834a";
 }
 
-function loadData() {
+function escapeHTML(value = "") {
+  return String(value).replace(/[&<>"']/g, c => ({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+  })[c]);
+}
+
+async function updateScreen() {
+  const {data, error} = await supabase.auth.getSession();
+  if (error) return notice(error.message, true);
+
+  currentUser = data.session?.user || null;
+  $("authCard").classList.toggle("hidden", !!currentUser);
+  $("appArea").classList.toggle("hidden", !currentUser);
+  $("accountLabel").textContent = currentUser ? currentUser.email : "Your social space";
+
+  if (currentUser) {
+    $("profileInfo").textContent = "Signed in as " + currentUser.email;
+    await loadFeed();
+  }
+}
+
+async function signUp() {
+  const email = $("email").value.trim();
+  const password = $("password").value;
+  if (!email || password.length < 6) {
+    return notice("Enter a valid email and a password of at least 6 characters.", true);
+  }
+
+  $("signupBtn").disabled = true;
+  notice("Creating your account...");
+
   try {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved) {
-      const parsed = JSON.parse(saved);
-      if (parsed && Array.isArray(parsed.posts)) {
-        parsed.following = Array.isArray(parsed.following) ? parsed.following : [];
-        parsed.posts.forEach(p => {
-          if (!Array.isArray(p.likes)) p.likes = [];
-          if (!Array.isArray(p.comments)) p.comments = [];
-        });
-        return parsed;
-      }
+    const {data, error} = await supabase.auth.signUp({email, password});
+    if (error) throw error;
+
+    if (data.session) {
+      notice("Account created! Welcome to Vibe.");
+      await updateScreen();
+    } else {
+      notice("Account created. Check your email for a confirmation link, then log in.");
     }
-  } catch (error) {}
-  return initialData();
+  } catch (e) {
+    notice(e.message || "Account creation failed.", true);
+  } finally {
+    $("signupBtn").disabled = false;
+  }
 }
 
-let data = loadData();
+async function signIn(event) {
+  event.preventDefault();
+  $("loginBtn").disabled = true;
+  notice("Logging in...");
 
-function saveData() {
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-    return true;
-  } catch (error) {
-    showNotice('Could not save data in this browser.');
-    return false;
-  }
-}
-
-function showNotice(message) {
-  const el = document.getElementById('notice');
-  el.textContent = message;
-  clearTimeout(noticeTimer);
-  noticeTimer = setTimeout(() => el.textContent = '', 3500);
-}
-
-function escapeHTML(value) {
-  return String(value).replace(/[&<>"']/g, char => ({
-    '&': '&amp;',
-    '<': '&lt;',
-    '>': '&gt;',
-    '"': '&quot;',
-    "'": '&#39;'
-  })[char]);
-}
-
-function initials(name) {
-  return (name || 'Y').trim().charAt(0).toUpperCase() || 'Y';
-}
-
-function currentName() {
-  return data.name || 'Your Name';
-}
-
-function showPage(nextPage) {
-  page = nextPage;
-
-  ['feed', 'search', 'messages', 'profile'].forEach(name => {
-    document.getElementById(name + 'Page')
-      .classList.toggle('hidden', name !== nextPage);
-    document.getElementById('nav-' + name)
-      .classList.toggle('active', name === nextPage);
-  });
-
-  if (nextPage === 'feed') renderPosts();
-  if (nextPage === 'search') searchPosts();
-  if (nextPage === 'profile') renderProfile();
-}
-
-function createPost() {
-  const input = document.getElementById('postInput');
-  const text = input.value.trim();
-
-  if (!text) {
-    showNotice('Write something before posting.');
-    return;
-  }
-
-  data.posts.unshift({
-    id: Date.now(),
-    user: currentName(),
-    text: text,
-    likes: [],
-    comments: []
-  });
-
-  input.value = '';
-  saveData();
-  renderPosts();
-  showNotice('Your post was added on this device!');
-}
-
-function setFilter(nextFilter) {
-  filter = nextFilter;
-  document.getElementById('allTab').className =
-    filter === 'all' ? 'active' : 'secondary';
-  document.getElementById('followingTab').className =
-    filter === 'following' ? 'active' : 'secondary';
-  renderPosts();
-}
-
-function postHTML(post) {
-  const liked = post.likes.includes(currentName());
-  const commentsHTML = post.comments.map(comment =>
-    '<div class="comment"><b>' + escapeHTML(comment.user) +
-    '</b><br>' + escapeHTML(comment.text) + '</div>'
-  ).join('');
-
-  const isOwnPost = post.user === currentName();
-
-  return `
-    <article class="card">
-      <div class="row">
-        <div class="avatar">${escapeHTML(initials(post.user))}</div>
-        <div style="flex:1">
-          <h3>${escapeHTML(post.user)}</h3>
-          <div class="muted">Vibe community</div>
-        </div>
-        ${!isOwnPost && post.user !== 'Vibe Community'
-          ? `<button class="secondary small-btn" onclick="toggleFollow('${escapeHTML(post.user)}')">
-              ${data.following.includes(post.user) ? 'Following' : 'Follow'}
-            </button>` : ''}
-      </div>
-
-      <div class="post-text">${escapeHTML(post.text)}</div>
-
-      <div class="actions">
-        <button class="${liked ? 'liked' : ''}" onclick="likePost(${post.id})">
-          ${liked ? '♥' : '♡'} ${post.likes.length} Likes
-        </button>
-        <button onclick="toggleComments(${post.id})">
-          ◯ ${post.comments.length} Comments
-        </button>
-        ${isOwnPost
-          ? `<button onclick="deletePost(${post.id})">Delete</button>`
-          : ''}
-      </div>
-
-      <div id="comments-${post.id}" class="hidden" style="margin-top:12px">
-        <div class="comment-form">
-          <input id="commentInput-${post.id}" maxlength="500"
-            placeholder="Write a comment...">
-          <button onclick="addComment(${post.id})">Send</button>
-        </div>
-        ${commentsHTML}
-      </div>
-    </article>`;
-}
-
-function renderPosts() {
-  const posts = filter === 'all'
-    ? data.posts
-    : data.posts.filter(post =>
-        data.following.includes(post.user) || post.user === currentName()
-      );
-
-  document.getElementById('posts').innerHTML = posts.length
-    ? posts.map(postHTML).join('')
-    : '<div class="empty">No posts here yet. Follow someone or create a post!</div>';
-}
-
-function likePost(id) {
-  const post = data.posts.find(item => item.id === id);
-  if (!post) return;
-
-  const index = post.likes.indexOf(currentName());
-  if (index >= 0) {
-    post.likes.splice(index, 1);
-  } else {
-    post.likes.push(currentName());
-  }
-
-  saveData();
-  renderPosts();
-}
-
-function toggleComments(id) {
-  const element = document.getElementById('comments-' + id);
-  if (element) element.classList.toggle('hidden');
-}
-
-function addComment(id) {
-  const post = data.posts.find(item => item.id === id);
-  const input = document.getElementById('commentInput-' + id);
-
-  if (!post || !input || !input.value.trim()) {
-    showNotice('Write a comment first.');
-    return;
-  }
-
-  post.comments.push({
-    user: currentName(),
-    text: input.value.trim()
-  });
-
-  saveData();
-  renderPosts();
-
-  const comments = document.getElementById('comments-' + id);
-  if (comments) comments.classList.remove('hidden');
-}
-
-function deletePost(id) {
-  const post = data.posts.find(item => item.id === id);
-  if (!post || post.user !== currentName()) return;
-
-  if (!confirm('Delete this post?')) return;
-
-  data.posts = data.posts.filter(item => item.id !== id);
-  saveData();
-  renderPosts();
-  showNotice('Post deleted.');
-}
-
-function toggleFollow(name) {
-  if (name === currentName()) return;
-
-  if (data.following.includes(name)) {
-    data.following = data.following.filter(item => item !== name);
-    showNotice('You unfollowed ' + name + '.');
-  } else {
-    data.following.push(name);
-    showNotice('You are now following ' + name + '.');
-  }
-
-  saveData();
-  renderPosts();
-  if (page === 'search') searchPosts();
-}
-
-function saveProfile() {
-  const name = document.getElementById('nameInput').value.trim();
-  const bio = document.getElementById('bioInput').value.trim();
-
-  if (!name) {
-    showNotice('Please enter a display name.');
-    return;
-  }
-
-  const oldName = currentName();
-
-  data.posts.forEach(post => {
-    if (post.user === oldName) post.user = name;
-    post.likes = post.likes.map(user => user === oldName ? name : user);
-    post.comments.forEach(comment => {
-      if (comment.user === oldName) comment.user = name;
+    const {error} = await supabase.auth.signInWithPassword({
+      email: $("email").value.trim(),
+      password: $("password").value
     });
+    if (error) throw error;
+    notice("Logged in successfully!");
+    await updateScreen();
+  } catch (e) {
+    notice(e.message || "Login failed.", true);
+  } finally {
+    $("loginBtn").disabled = false;
+  }
+}
+
+async function loadFeed() {
+  $("feed").textContent = "Loading posts...";
+
+  try {
+    const {data, error} = await supabase
+      .from("posts")
+      .select("id,user_id,content,created_at,profiles(username,display_name)")
+      .order("created_at", {ascending:false})
+      .limit(50);
+
+    if (error) throw error;
+    allPosts = data || [];
+    renderFeed();
+  } catch (e) {
+    $("feed").textContent = "";
+    const box = document.createElement("div");
+    box.className = "card";
+    box.textContent = "Could not load posts: " + e.message;
+    $("feed").appendChild(box);
+  }
+}
+
+function renderFeed() {
+  const query = $("searchInput").value.trim().toLowerCase();
+  const posts = allPosts.filter(post => {
+    const profile = Array.isArray(post.profiles) ? post.profiles[0] : post.profiles;
+    return (post.content || "").toLowerCase().includes(query) ||
+      (profile?.username || "").toLowerCase().includes(query) ||
+      (profile?.display_name || "").toLowerCase().includes(query);
   });
 
-  data.following = data.following.map(user => user === oldName ? name : user);
-  data.name = name;
-  data.bio = bio;
+  $("feed").innerHTML = "";
 
-  saveData();
-  renderProfile();
-  renderPosts();
-  showNotice('Profile saved on this device.');
-}
-
-function renderProfile() {
-  const name = currentName();
-  document.getElementById('profileName').textContent = name;
-  document.getElementById('profileAvatar').textContent = initials(name);
-  document.getElementById('composerAvatar').textContent = initials(name);
-  document.getElementById('profileBio').textContent = data.bio || 'No bio yet.';
-  document.getElementById('nameInput').value = name;
-  document.getElementById('bioInput').value = data.bio || '';
-
-  const ownPosts = data.posts.filter(post => post.user === name);
-  document.getElementById('profileStats').textContent =
-    ownPosts.length + (ownPosts.length === 1 ? ' post' : ' posts');
-
-  document.getElementById('myPosts').innerHTML = ownPosts.length
-    ? ownPosts.map(postHTML).join('')
-    : '<div class="empty">Your posts will appear here.</div>';
-}
-
-function searchPosts() {
-  const query = document.getElementById('search').value.trim().toLowerCase();
-  const results = document.getElementById('searchResults');
-
-  const matchingPosts = data.posts.filter(post =>
-    post.user.toLowerCase().includes(query) ||
-    post.text.toLowerCase().includes(query)
-  );
-
-  if (!query) {
-    results.innerHTML = '<div class="empty">Type in the search box above to discover posts and people.</div>';
+  if (!posts.length) {
+    const box = document.createElement("div");
+    box.className = "card muted";
+    box.textContent = query ? "No matching posts found." : "No posts yet. Be the first to share!";
+    $("feed").appendChild(box);
     return;
   }
 
-  results.innerHTML = matchingPosts.length
-    ? matchingPosts.map(postHTML).join('')
-    : '<div class="empty">No matching posts found.</div>';
+  posts.forEach(post => {
+    const profile = Array.isArray(post.profiles) ? post.profiles[0] : post.profiles;
+    const name = profile?.display_name || profile?.username || "Vibe user";
+    const card = document.createElement("article");
+    card.className = "card";
+
+    const head = document.createElement("div");
+    head.className = "post-head";
+
+    const avatar = document.createElement("div");
+    avatar.className = "avatar";
+    avatar.textContent = name.charAt(0).toUpperCase();
+
+    const details = document.createElement("div");
+    const title = document.createElement("strong");
+    title.textContent = name;
+    const username = document.createElement("div");
+    username.className = "muted";
+    username.textContent = "@" + (profile?.username || "user");
+    details.append(title, username);
+    head.append(avatar, details);
+
+    const content = document.createElement("p");
+    content.className = "post-text";
+    content.textContent = post.content || "";
+
+    const time = document.createElement("div");
+    time.className = "muted";
+    time.textContent = new Date(post.created_at).toLocaleString();
+
+    card.append(head, content, time);
+    $("feed").appendChild(card);
+  });
 }
 
-document.getElementById('search').addEventListener('input', () => {
-  if (page !== 'search') showPage('search');
-  else searchPosts();
+async function createPost(event) {
+  event.preventDefault();
+  if (!currentUser) return notice("Please log in first.", true);
+
+  const content = $("postContent").value.trim();
+  if (!content) return notice("Write something before posting.", true);
+
+  $("publishBtn").disabled = true;
+
+  try {
+    const {error} = await supabase.from("posts").insert({
+      user_id: currentUser.id,
+      content
+    });
+    if (error) throw error;
+
+    $("postContent").value = "";
+    notice("Your post has been published!");
+    await loadFeed();
+  } catch (e) {
+    notice(e.message || "Could not publish post.", true);
+  } finally {
+    $("publishBtn").disabled = false;
+  }
+}
+
+async function logOut() {
+  const {error} = await supabase.auth.signOut();
+  if (error) return notice(error.message, true);
+  currentUser = null;
+  allPosts = [];
+  $("feed").innerHTML = "";
+  notice("You have logged out.");
+  await updateScreen();
+}
+
+$("authForm").addEventListener("submit", signIn);
+$("signupBtn").addEventListener("click", signUp);
+$("postForm").addEventListener("submit", createPost);
+$("refreshBtn").addEventListener("click", loadFeed);
+$("searchInput").addEventListener("input", renderFeed);
+$("logoutBtn").addEventListener("click", logOut);
+$("homeBtn").addEventListener("click", () => window.scrollTo({top:0,behavior:"smooth"}));
+$("searchBtn").addEventListener("click", () => $("searchInput").focus());
+$("profileBtn").addEventListener("click", () => $("profileInfo").scrollIntoView({behavior:"smooth"}));
+
+supabase.auth.onAuthStateChange((_event, session) => {
+  currentUser = session?.user || null;
+  $("authCard").classList.toggle("hidden", !!currentUser);
+  $("appArea").classList.toggle("hidden", !currentUser);
+  $("accountLabel").textContent = currentUser ? currentUser.email : "Your social space";
+  if (currentUser) {
+    $("profileInfo").textContent = "Signed in as " + currentUser.email;
+    loadFeed();
+  }
 });
 
-document.getElementById('postInput').addEventListener('keydown', event => {
-  if (event.key === 'Enter') createPost();
-});
-
-renderPosts();
-renderProfile();
+updateScreen();
 </script>
 </body>
 </html>
