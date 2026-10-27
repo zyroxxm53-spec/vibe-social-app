@@ -7,131 +7,88 @@
 <meta name="theme-color" content="#ffffff">
 <title>Vibe — Your people, your space</title>
 <style>
-:root {
-  --bg:#f7f8fc; --surface:#fff; --text:#172033; --muted:#8991a3;
-  --line:#eceef4; --accent:#6857f5; --accent-light:#f0edff;
-  --pink:#f15b83; --shadow:0 5px 25px rgba(27,35,70,.045);
-}
-* {box-sizing:border-box}
-body {margin:0;background:var(--bg);color:var(--text);font:14px Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif}
-button,input,textarea {font:inherit}
-button {cursor:pointer;transition:.2s}
-button:disabled {opacity:.55;cursor:wait}
-.hidden {display:none!important}
-.muted {color:var(--muted);font-size:12px}
-header {
-  height:70px;background:rgba(255,255,255,.94);border-bottom:1px solid var(--line);
-  display:flex;align-items:center;justify-content:space-between;padding:0 5%;
-  position:sticky;top:0;z-index:10;backdrop-filter:blur(14px)
-}
-.brand {font-size:29px;font-weight:900;letter-spacing:-1.7px;color:var(--accent)}
-.brand span {color:var(--text)}
-.header-right {display:flex;align-items:center;gap:12px}
-.header-tag {color:var(--muted);font-size:12px}
-button.primary {background:var(--accent);color:white;border:0;border-radius:12px;padding:12px 17px;font-weight:750}
-button.primary:hover {filter:brightness(.96);transform:translateY(-1px)}
-button.secondary {background:var(--accent-light);color:var(--accent);border:0;border-radius:11px;padding:11px 14px;font-weight:700}
-button.ghost {background:transparent;color:var(--muted);border:1px solid var(--line);border-radius:10px;padding:9px 12px}
-button.danger {background:#fff0f1;color:#cf3655;border:0;border-radius:10px;padding:10px}
-.layout {max-width:1240px;margin:28px auto;padding:0 22px;display:grid;grid-template-columns:220px minmax(0,620px) 260px;gap:25px;align-items:start}
-.side,.right-side {position:sticky;top:94px}
-.panel,.card {background:var(--surface);border:1px solid var(--line);border-radius:19px;box-shadow:var(--shadow)}
-.side {padding:15px}
-.nav-title {font-size:11px;text-transform:uppercase;letter-spacing:1.3px;color:var(--muted);padding:10px 12px}
-.nav-item {display:flex;align-items:center;gap:12px;width:100%;padding:13px 12px;margin:3px 0;border:0;background:transparent;border-radius:12px;text-align:left;color:#596176;font-weight:650}
-.nav-item .ico {width:23px;font-size:18px;text-align:center}
-.nav-item.active,.nav-item:hover {background:var(--accent-light);color:var(--accent)}
-.side-note {border-top:1px solid var(--line);margin-top:14px;padding:16px 10px 5px;line-height:1.7}
-main {min-width:0}
-#status {padding:12px 15px;border-radius:12px;background:var(--accent-light);color:#5140c8;margin-bottom:15px;overflow-wrap:anywhere}
-#status.error {background:#fff0f1;color:#ae2340}
-.card {padding:20px;margin-bottom:17px}
-h1,h2,h3,p {margin-top:0}
-h2 {font-size:19px;letter-spacing:-.4px;margin-bottom:8px}
-h3 {font-size:14px;margin-bottom:10px}
-input,textarea {
-  width:100%;border:1px solid #e4e7ef;border-radius:12px;padding:13px 14px;
-  margin:7px 0 13px;background:#fbfcff;color:var(--text);outline:none
-}
-input:focus,textarea:focus {border-color:#9b90ff;box-shadow:0 0 0 3px #6857f51a}
-textarea {min-height:95px;resize:vertical}
-label {font-size:12px;font-weight:700;color:#60697c}
-.auth-wrap {max-width:440px;margin:65px auto;padding:0 16px}
-.auth-card {padding:30px}
-.auth-logo {font-size:40px;font-weight:900;color:var(--accent);letter-spacing:-2px;margin-bottom:10px}
-.auth-card h2 {font-size:25px}
-.auth-card button {margin:4px 4px 4px 0}
-.auth-foot {line-height:1.7;margin-top:15px}
-.profile-top {display:flex;align-items:center;gap:13px;margin-bottom:19px}
-.avatar {
-  width:46px;height:46px;border-radius:50%;display:flex;align-items:center;
-  justify-content:center;background:linear-gradient(135deg,#8978ff,#eaa1cc);
-  color:white;font-weight:850;font-size:17px;flex-shrink:0
-}
-.avatar.small {width:36px;height:36px;font-size:13px}
-.profile-name {font-size:17px;font-weight:800}
-.profile-handle {font-size:12px;color:var(--muted);margin-top:4px}
-.composer {display:flex;gap:12px;align-items:flex-start}
-.composer textarea {min-height:70px;margin:0 0 12px;background:#f8f9fd;border:0}
-.composer-bottom {display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
-.feed-heading {display:flex;justify-content:space-between;align-items:center;margin:23px 3px 14px}
-.post-card {padding:19px}
-.post-head {display:flex;justify-content:space-between;gap:10px;align-items:center}
-.author {display:flex;align-items:center;gap:10px;min-width:0}
-.author strong {display:block;overflow-wrap:anywhere}
-.post-date {font-size:11px;color:var(--muted);margin-top:4px}
-.post {white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.8;font-size:14px;margin:19px 0}
-.post-actions {display:flex;align-items:center;gap:8px;border-top:1px solid var(--line);padding-top:12px}
-.action-btn {border:0;border-radius:10px;background:transparent;color:#697186;padding:9px 11px;font-weight:700}
-.action-btn:hover {background:#f5f3ff;color:var(--accent)}
-.action-btn.liked {color:var(--pink);background:#fff0f4}
-.comments {margin-top:13px}
-.comment {padding:10px 12px;background:#f7f8fc;border-radius:11px;margin:7px 0;line-height:1.6;overflow-wrap:anywhere}
-.comment-form {display:flex;gap:8px;margin-top:12px}
-.comment-form input {margin:0;min-width:0;padding:11px}
-.comment-form button {white-space:nowrap}
-.right-card {padding:17px;margin-bottom:16px}
-.search-box {position:relative;margin-bottom:15px}
-.search-box input {padding-left:40px;margin:0;background:white}
-.search-symbol {position:absolute;left:14px;top:14px;color:var(--muted)}
-.story-strip {display:flex;gap:15px;overflow-x:auto;padding:4px 0 15px;margin-bottom:8px}
-.story {min-width:62px;text-align:center;font-size:11px;color:var(--muted)}
-.story-ring {width:54px;height:54px;border-radius:50%;padding:3px;margin:0 auto 7px;background:linear-gradient(135deg,#7159ff,#f46d9a)}
-.story-ring div {background:white;width:100%;height:100%;border-radius:50%;display:grid;place-items:center;font-size:19px}
-.story-caption {white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.people-row {display:flex;align-items:center;gap:10px;margin:15px 0}
-.people-row .details {min-width:0;flex:1}
-.people-row strong {font-size:12px;display:block;overflow-wrap:anywhere}
-.people-row .muted {margin-top:4px}
-.right-title {display:flex;align-items:center;justify-content:space-between}
-.empty {padding:25px 12px;text-align:center;color:var(--muted);line-height:1.7}
-.empty-icon {font-size:30px;margin-bottom:10px}
-footer {text-align:center;color:var(--muted);font-size:11px;padding:25px 12px}
-#profilePanel {scroll-margin-top:90px}
-#feed {min-width:0}
-@media(max-width:1050px) {
- .layout {grid-template-columns:190px minmax(0,620px);justify-content:center}
- .right-side {display:none}
-}
-@media(max-width:680px) {
- header {height:61px;padding:0 16px}
- .brand {font-size:26px}
- .header-tag {display:none}
- .layout {display:block;margin:15px auto;padding:0 12px}
- .side {position:fixed;top:auto;bottom:0;left:0;right:0;z-index:20;border-radius:16px 16px 0 0;
-   padding:6px 8px calc(6px + env(safe-area-inset-bottom));display:flex;justify-content:space-around;
-   border:1px solid var(--line);background:rgba(255,255,255,.97)}
- .nav-title,.side-note {display:none}
- .nav-item {width:auto;flex:1;justify-content:center;padding:11px 3px;margin:0;gap:0}
- .nav-item .nav-label {display:none}
- .nav-item .ico {font-size:21px;width:auto}
- main {padding-bottom:75px}
- .card {border-radius:16px;padding:16px}
- .post-card {padding:15px}
- .auth-wrap {margin:35px auto}
- .auth-card {padding:23px}
- .feed-heading {margin-top:19px}
-}
+:root{--bg:#f7f8fc;--surface:#fff;--text:#172033;--muted:#8991a3;--line:#eceef4;--accent:#6857f5;--accent-light:#f0edff;--pink:#f15b83;--shadow:0 5px 25px rgba(27,35,70,.045)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:14px Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif}
+button,input,textarea{font:inherit}
+button{cursor:pointer;transition:.2s}
+button:disabled{opacity:.55;cursor:wait}
+.hidden{display:none!important}
+.muted{color:var(--muted);font-size:12px}
+header{height:70px;background:rgba(255,255,255,.94);border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 5%;position:sticky;top:0;z-index:10;backdrop-filter:blur(14px)}
+.brand{font-size:29px;font-weight:900;letter-spacing:-1.7px;color:var(--accent)}
+.brand span{color:var(--text)}
+.header-right{display:flex;align-items:center;gap:12px}
+.header-tag{color:var(--muted);font-size:12px}
+button.primary{background:var(--accent);color:white;border:0;border-radius:12px;padding:12px 17px;font-weight:750}
+button.secondary{background:var(--accent-light);color:var(--accent);border:0;border-radius:11px;padding:11px 14px;font-weight:700}
+button.ghost{background:transparent;color:var(--muted);border:1px solid var(--line);border-radius:10px;padding:9px 12px}
+.layout{max-width:1240px;margin:28px auto;padding:0 22px;display:grid;grid-template-columns:220px minmax(0,620px) 260px;gap:25px;align-items:start}
+.side,.right-side{position:sticky;top:94px}
+.panel,.card{background:var(--surface);border:1px solid var(--line);border-radius:19px;box-shadow:var(--shadow)}
+.side{padding:15px}
+.nav-title{font-size:11px;text-transform:uppercase;letter-spacing:1.3px;color:var(--muted);padding:10px 12px}
+.nav-item{display:flex;align-items:center;gap:12px;width:100%;padding:13px 12px;margin:3px 0;border:0;background:transparent;border-radius:12px;text-align:left;color:#596176;font-weight:650}
+.nav-item.active,.nav-item:hover{background:var(--accent-light);color:var(--accent)}
+.nav-item .ico{width:23px;font-size:18px;text-align:center}
+.side-note{border-top:1px solid var(--line);margin-top:14px;padding:16px 10px 5px;line-height:1.7}
+main{min-width:0}
+#status{padding:12px 15px;border-radius:12px;background:var(--accent-light);color:#5140c8;margin:15px auto;max-width:900px;overflow-wrap:anywhere}
+#status.error{background:#fff0f1;color:#ae2340}
+.card{padding:20px;margin-bottom:17px}
+h1,h2,h3,p{margin-top:0}
+h2{font-size:19px;letter-spacing:-.4px;margin-bottom:8px}
+h3{font-size:14px;margin-bottom:10px}
+input,textarea{width:100%;border:1px solid #e4e7ef;border-radius:12px;padding:13px 14px;margin:7px 0 13px;background:#fbfcff;color:var(--text);outline:none}
+input:focus,textarea:focus{border-color:#9b90ff;box-shadow:0 0 0 3px #6857f51a}
+textarea{min-height:95px;resize:vertical}
+label{font-size:12px;font-weight:700;color:#60697c}
+.auth-wrap{max-width:440px;margin:65px auto;padding:0 16px}
+.auth-card{padding:30px}
+.auth-logo{font-size:40px;font-weight:900;color:var(--accent);letter-spacing:-2px;margin-bottom:10px}
+.auth-card h2{font-size:25px}
+.auth-card button{margin:4px 4px 4px 0}
+.auth-foot{line-height:1.7;margin-top:15px}
+.profile-top{display:flex;align-items:center;gap:13px;margin-bottom:19px}
+.avatar{width:46px;height:46px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#8978ff,#eaa1cc);color:white;font-weight:850;font-size:17px;flex-shrink:0}
+.avatar.small{width:36px;height:36px;font-size:13px}
+.profile-name{font-size:17px;font-weight:800}
+.profile-handle{font-size:12px;color:var(--muted);margin-top:4px}
+.composer{display:flex;gap:12px;align-items:flex-start}
+.composer textarea{min-height:70px;margin:0 0 12px;background:#f8f9fd;border:0}
+.composer-bottom{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.feed-heading{display:flex;justify-content:space-between;align-items:center;margin:23px 3px 14px}
+.post-card{padding:19px}
+.post-head{display:flex;justify-content:space-between;gap:10px;align-items:center}
+.author{display:flex;align-items:center;gap:10px;min-width:0}
+.author strong{display:block;overflow-wrap:anywhere}
+.post-date{font-size:11px;color:var(--muted);margin-top:4px}
+.post{white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.8;font-size:14px;margin:19px 0}
+.post-actions{display:flex;align-items:center;gap:8px;border-top:1px solid var(--line);padding-top:12px}
+.action-btn{border:0;border-radius:10px;background:transparent;color:#697186;padding:9px 11px;font-weight:700}
+.action-btn.liked{color:var(--pink);background:#fff0f4}
+.comments{margin-top:13px}
+.comment{padding:10px 12px;background:#f7f8fc;border-radius:11px;margin:7px 0;line-height:1.6;overflow-wrap:anywhere}
+.comment-form{display:flex;gap:8px;margin-top:12px}
+.comment-form input{margin:0;min-width:0;padding:11px}
+.comment-form button{white-space:nowrap}
+.right-card{padding:17px;margin-bottom:16px}
+.search-box{position:relative;margin-bottom:15px}
+.search-box input{padding-left:40px;margin:0;background:white}
+.search-symbol{position:absolute;left:14px;top:14px;color:var(--muted)}
+.story-strip{display:flex;gap:15px;overflow-x:auto;padding:4px 0 15px;margin-bottom:8px}
+.story{min-width:62px;text-align:center;font-size:11px;color:var(--muted)}
+.story-ring{width:54px;height:54px;border-radius:50%;padding:3px;margin:0 auto 7px;background:linear-gradient(135deg,#7159ff,#f46d9a)}
+.story-ring div{background:white;width:100%;height:100%;border-radius:50%;display:grid;place-items:center;font-size:19px}
+.story-caption{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.people-row{display:flex;align-items:center;gap:10px;margin:15px 0}
+.people-row .details{min-width:0;flex:1}
+.people-row strong{font-size:12px;display:block;overflow-wrap:anywhere}
+.empty{padding:25px 12px;text-align:center;color:var(--muted);line-height:1.7}
+.empty-icon{font-size:30px;margin-bottom:10px}
+footer{text-align:center;color:var(--muted);font-size:11px;padding:25px 12px}
+@media(max-width:1050px){.layout{grid-template-columns:190px minmax(0,620px);justify-content:center}.right-side{display:none}}
+@media(max-width:680px){header{height:61px;padding:0 16px}.brand{font-size:26px}.header-tag{display:none}.layout{display:block;margin:15px auto;padding:0 12px}.side{position:fixed;top:auto;bottom:0;left:0;right:0;z-index:20;border-radius:16px 16px 0 0;padding:6px 8px calc(6px + env(safe-area-inset-bottom));display:flex;justify-content:space-around;border:1px solid var(--line);background:rgba(255,255,255,.97)}.nav-title,.side-note{display:none}.nav-item{width:auto;flex:1;justify-content:center;padding:11px 3px;margin:0;gap:0}.nav-item .nav-label{display:none}.nav-item .ico{font-size:21px;width:auto}main{padding-bottom:75px}.card{border-radius:16px;padding:16px}.post-card{padding:15px}.auth-wrap{margin:35px auto}.auth-card{padding:23px}}
 </style>
 </head>
 <body>
@@ -225,7 +182,7 @@ footer {text-align:center;color:var(--muted);font-size:11px;padding:25px 12px}
     </section>
 
     <section id="messagesPanel" class="card hidden">
-      <div class="empty"><div class="empty-icon">✉</div><h2>Messages are coming</h2><p>Private messaging is planned for the next stage. We'll connect it to your existing Supabase messages table after checking its columns and security policies.</p></div>
+      <div class="empty"><div class="empty-icon">✉</div><h2>Messages are coming</h2><p>Private messaging will be connected in a later stage.</p></div>
     </section>
   </main>
 
@@ -235,151 +192,174 @@ footer {text-align:center;color:var(--muted);font-size:11px;padding:25px 12px}
       <div class="people-row"><div class="avatar small" id="sideAvatar">V</div><div class="details"><strong id="sideName">Vibe member</strong><div id="sideHandle" class="muted">@member</div></div></div>
       <button class="secondary" id="editProfileBtn" style="width:100%">Edit profile</button>
     </section>
-    <section class="panel right-card">
-      <h3>Community guidelines</h3>
-      <p class="muted" style="line-height:1.8;margin-bottom:0">Be kind. Respect privacy. Share responsibly. Make Vibe a welcoming space for everyone.</p>
-    </section>
-    <section class="panel right-card">
-      <h3>Vibe note ✦</h3>
-      <p class="muted" style="line-height:1.8;margin-bottom:0">You don't have to be perfect to post. Just be yourself.</p>
-    </section>
+    <section class="panel right-card"><h3>Community guidelines</h3><p class="muted" style="line-height:1.8;margin-bottom:0">Be kind. Respect privacy. Share responsibly. Make Vibe a welcoming space for everyone.</p></section>
+    <section class="panel right-card"><h3>Vibe note ✦</h3><p class="muted" style="line-height:1.8;margin-bottom:0">You don't have to be perfect to post. Just be yourself.</p></section>
   </aside>
 </div>
 <footer>Vibe · Your people, your space.</footer>
 
 <script>
-(function () {
+(function(){
 "use strict";
+const SUPABASE_URL="https://nmslfnhbqprwpsxacuvy.supabase.co";
+const SUPABASE_KEY="sb_publishable_Snp3A0a0m_2HNCQwi2uR1g_RQ6id2uH";
+const $=id=>document.getElementById(id);
+let supabase=null,currentUser=null,currentProfile=null,busy=false,feedPosts=[];
 
-const SUPABASE_URL = "https://nmslfnhbqprwpsxacuvy.supabase.co";
-const SUPABASE_KEY = "sb_publishable_Snp3A0a0m_2HNCQwi2uR1g_RQ6id2uH";
-const $ = id => document.getElementById(id);
-let supabase = null, currentUser = null, currentProfile = null, busy = false;
-let feedPosts = [];
-
-function status(message, isError = false) {
-  $("status").textContent = message;
-  $("status").classList.toggle("error", isError);
+function status(message,isError=false){
+  $("status").textContent=message;
+  $("status").classList.toggle("error",isError);
   $("status").classList.remove("hidden");
 }
-function showApp(signedIn) {
-  $("authCard").classList.toggle("hidden", signedIn);
-  $("appArea").classList.toggle("hidden", !signedIn);
-  $("status").classList.remove("hidden");
-  $("logoutBtn").classList.toggle("hidden", !signedIn);
+function showApp(signedIn){
+  $("authCard").classList.toggle("hidden",signedIn);
+  $("appArea").classList.toggle("hidden",!signedIn);
+  $("logoutBtn").classList.toggle("hidden",!signedIn);
 }
-function setBusy(value) {
-  busy = value;
-  document.querySelectorAll("button").forEach(b => b.disabled = value);
+function setBusy(value){
+  busy=value;
+  document.querySelectorAll("button").forEach(b=>b.disabled=value);
 }
-function friendlyError(error) {
-  console.error("Vibe error:", error);
-  status(error && error.message ? error.message : String(error), true);
+function friendlyError(error){
+  console.error("Vibe error:",error);
+  status(error?.message||String(error),true);
 }
-async function runTask(task) {
-  if (busy) return;
+async function runTask(task){
+  if(busy)return;
   setBusy(true);
-  try { await task(); }
-  catch (error) { friendlyError(error); }
-  finally { setBusy(false); }
+  try{await task();}
+  catch(error){friendlyError(error);}
+  finally{setBusy(false);}
 }
-function make(tag, text, className) {
-  const e = document.createElement(tag);
-  if (text !== undefined) e.textContent = text;
-  if (className) e.className = className;
+function make(tag,text,className){
+  const e=document.createElement(tag);
+  if(text!==undefined)e.textContent=text;
+  if(className)e.className=className;
   return e;
 }
-function initials(name) {
-  return (name || "V").trim().slice(0,1).toUpperCase();
+function initials(name){return(name||"V").trim().slice(0,1).toUpperCase();}
+
+function syncProfileUI(){
+  const p=currentProfile||{};
+  const name=p.display_name||p.username||"Vibe member";
+  $("profileName").textContent=name;
+  $("displayName").value=p.display_name||"";
+  $("username").value=p.username||"";
+  $("bio").value=p.bio||"";
+  $("composerName").textContent=name;
+  $("composerAvatar").textContent=initials(name);
+  $("profileAvatar").textContent=initials(name);
+  $("sideAvatar").textContent=initials(name);
+  $("sideName").textContent=name;
+  $("sideHandle").textContent="@"+(p.username||"member");
 }
-function syncProfileUI() {
-  const name = currentProfile && (currentProfile.display_name || currentProfile.username) || "Vibe member";
-  const username = currentProfile && currentProfile.username || "member";
-  $("profileName").textContent = name;
-  $("displayName").value = currentProfile.display_name || "";
-  $("username").value = currentProfile.username || "";
-  $("bio").value = currentProfile.bio || "";
-  $("composerName").textContent = name;
-  $("composerAvatar").textContent = initials(name);
-  $("profileAvatar").textContent = initials(name);
-  $("sideAvatar").textContent = initials(name);
-  $("sideName").textContent = name;
-  $("sideHandle").textContent = "@" + username;
-}
-async function loadProfile() {
-  const {data,error} = await supabase.from("profiles").select("*").eq("id",currentUser.id).maybeSingle();
-  if (error) throw error;
-  if (!data) {
-    const base = (currentUser.email || "vibeuser").split("@")[0].toLowerCase().replace(/[^a-z0-9_]/g,"").slice(0,18) || "vibeuser";
-    const result = await supabase.from("profiles").upsert({
-      id:currentUser.id, username:base+"_"+currentUser.id.slice(0,5),
-      display_name:base, bio:"", created_at:new Date().toISOString()
+
+async function loadProfile(){
+  const {data,error}=await supabase.from("profiles").select("*").eq("id",currentUser.id).maybeSingle();
+  if(error)throw error;
+  if(!data){
+    const base=(currentUser.email||"vibeuser").split("@")[0].toLowerCase().replace(/[^a-z0-9_]/g,"").slice(0,18)||"vibeuser";
+    const result=await supabase.from("profiles").upsert({
+      id:currentUser.id,username:base+"_"+currentUser.id.slice(0,5),
+      display_name:base,bio:""
     },{onConflict:"id"}).select().single();
-    if (result.error) throw result.error;
-    currentProfile = result.data;
-  } else currentProfile = data;
+    if(result.error)throw result.error;
+    currentProfile=result.data;
+  }else currentProfile=data;
   syncProfileUI();
 }
-function renderSearchResults(query) {
-  const target = $("searchResults");
+
+function renderSearchResults(query){
+  const target=$("searchResults");
   target.replaceChildren();
-  const q = query.trim().toLowerCase();
-  if (!q) { target.textContent = "Type to search your feed."; return; }
-  const results = feedPosts.filter(p => {
-    const author = p._author || {};
-    return (p.content || p.body || "").toLowerCase().includes(q) ||
-      (author.username || "").toLowerCase().includes(q) ||
-      (author.display_name || "").toLowerCase().includes(q);
+  const q=query.trim().toLowerCase();
+  if(!q){target.textContent="Type to search your feed.";return;}
+  const results=feedPosts.filter(p=>{
+    const a=p._author||{};
+    return(p.content||p.body||"").toLowerCase().includes(q)||
+      (a.username||"").toLowerCase().includes(q)||
+      (a.display_name||"").toLowerCase().includes(q);
   });
-  if (!results.length) { target.textContent = "No matching posts in the loaded feed."; return; }
-  results.forEach(p => {
-    const card = make("div",undefined,"comment");
-    card.append(make("strong",(p._author && (p._author.display_name || p._author.username)) || "Vibe user"));
-    card.append(make("p",p.content || p.body || ""));
+  if(!results.length){target.textContent="No matching posts in the loaded feed.";return;}
+  results.forEach(p=>{
+    const card=make("div",undefined,"comment");
+    card.append(make("strong",(p._author&&(p._author.display_name||p._author.username))||"Vibe user"));
+    card.append(make("p",p.content||p.body||""));
     target.append(card);
   });
 }
-async function loadFeed() {
+
+async function loadFeed(){
   $("feed").replaceChildren(make("p","Loading posts…","muted"));
-  const {data:posts,error} = await supabase.from("posts").select("*").order("created_at",{ascending:false}).limit(50);
-  if (error) throw error;
-  feedPosts = posts || [];
-  if (!feedPosts.length) {
-    $("feed").replaceChildren();
-    const empty = make("div",undefined,"card empty");
+  const {data:posts,error}=await supabase.from("posts").select("*").order("created_at",{ascending:false}).limit(50);
+  if(error)throw error;
+  feedPosts=posts||[];
+  if(!feedPosts.length){
+    const empty=make("div",undefined,"card empty");
     empty.append(make("div","✦","empty-icon"),make("h2","Your feed starts here"),make("p","No posts yet. Share the first thought with your community."));
-    $("feed").append(empty);
+    $("feed").replaceChildren(empty);
     renderSearchResults($("feedSearch").value);
     return;
   }
-  const ids = feedPosts.map(p => p.id);
-  const authorIds = [...new Set(feedPosts.map(p => p.user_id))];
-  const {data:profiles,error:pe} = await supabase.from("profiles").select("id,username,display_name").in("id",authorIds);
-  if (pe) throw pe;
-  const profileMap = Object.fromEntries((profiles || []).map(p => [p.id,p]));
-  feedPosts.forEach(p => p._author = profileMap[p.user_id]);
-  const {data:likes,error:le} = await supabase.from("likes").select("post_id,user_id").in("post_id",ids);
-  if (le) throw le;
-  const {data:comments,error:ce} = await supabase.from("comments").select("*").in("post_id",ids).order("created_at",{ascending:true});
-  if (ce) throw ce;
-  const commentIds = [...new Set((comments || []).map(c => c.user_id))];
-  let commentMap = {};
-  if (commentIds.length) {
-    const {data:cp,error:cpe} = await supabase.from("profiles").select("id,username,display_name").in("id",commentIds);
-    if (cpe) throw cpe;
-    commentMap = Object.fromEntries((cp || []).map(p => [p.id,p]));
+  const ids=feedPosts.map(p=>p.id);
+  const authorIds=[...new Set(feedPosts.map(p=>p.user_id))];
+  const {data:profiles,error:pe}=await supabase.from("profiles").select("id,username,display_name").in("id",authorIds);
+  if(pe)throw pe;
+  const profileMap=Object.fromEntries((profiles||[]).map(p=>[p.id,p]));
+  feedPosts.forEach(p=>p._author=profileMap[p.user_id]);
+  const {data:likes,error:le}=await supabase.from("likes").select("post_id,user_id").in("post_id",ids);
+  if(le)throw le;
+  const {data:comments,error:ce}=await supabase.from("comments").select("*").in("post_id",ids).order("created_at",{ascending:true});
+  if(ce)throw ce;
+  const commentIds=[...new Set((comments||[]).map(c=>c.user_id))];
+  let commentMap={};
+  if(commentIds.length){
+    const {data:cp,error:cpe}=await supabase.from("profiles").select("id,username,display_name").in("id",commentIds);
+    if(cpe)throw cpe;
+    commentMap=Object.fromEntries((cp||[]).map(p=>[p.id,p]));
   }
-  const fragment = document.createDocumentFragment();
-  feedPosts.forEach(post => {
-    const author = post._author || {};
-    const name = author.display_name || author.username || "Vibe user";
-    const card = make("article",undefined,"card post-card");
-    const head = make("div",undefined,"post-head");
-    const authorBlock = make("div",undefined,"author");
+  const fragment=document.createDocumentFragment();
+  feedPosts.forEach(post=>{
+    const author=post._author||{};
+    const name=author.display_name||author.username||"Vibe user";
+    const card=make("article",undefined,"card post-card");
+    const head=make("div",undefined,"post-head");
+    const authorBlock=make("div",undefined,"author");
     authorBlock.append(make("div",initials(name),"avatar small"));
-    const identity = make("div");
-    identity.append(make("strong",name),make("div","@"+(author.username || "member"),"profile-handle"));
+    const identity=make("div");
+    identity.append(make("strong",name),make("div","@"+(author.username||"member"),"profile-handle"));
     authorBlock.append(identity);
-    head.append(authorBlock,make("span",post.created_at ? new Date(post.created_at).toLocaleDateString() : "Just now","post-date"));
-    card.append(head,make("div",post.content || post.body || "","post"));
-    const postLikes = (likes || []).filter(l => l.post_id 
+    head.append(authorBlock,make("span",post.created_at?new Date(post.created_at).toLocaleDateString():"Just now","post-date"));
+    card.append(head,make("div",post.content||post.body||"","post"));
+
+    const postLikes=(likes||[]).filter(l=>l.post_id===post.id);
+    const postComments=(comments||[]).filter(c=>c.post_id===post.id);
+    const liked=postLikes.some(l=>l.user_id===currentUser.id);
+    const actions=make("div",undefined,"post-actions");
+    const likeBtn=make("button",`${liked?"❤️ Liked":"♡ Like"} · ${postLikes.length}`,"action-btn"+(liked?" liked":""));
+    likeBtn.type="button";
+    likeBtn.onclick=()=>runTask(async()=>{
+      if(liked){
+        const {error}=await supabase.from("likes").delete().eq("post_id",post.id).eq("user_id",currentUser.id);
+        if(error)throw error;
+      }else{
+        const {error}=await supabase.from("likes").insert({post_id:post.id,user_id:currentUser.id});
+        if(error)throw error;
+      }
+      await loadFeed();
+    });
+    actions.append(likeBtn);
+    card.append(actions);
+
+    const commentBox=make("div",undefined,"comments");
+    postComments.forEach(c=>{
+      const cp=commentMap[c.user_id]||{};
+      const comment=make("div",undefined,"comment");
+      comment.append(make("strong","@"+(cp.username||"member")));
+      comment.append(document.createTextNode(" "+(c.content||c.body||"")));
+      commentBox.append(comment);
+    });
+    const form=make("form",undefined,"comment-form");
+    const input=make("input");
+    input.placeholder="Write a comment…";
+    input
